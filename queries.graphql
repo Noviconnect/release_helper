@@ -1,0 +1,36 @@
+query Issue($issueId: String!) {
+    issue(id: $issueId) {
+        id
+        title
+        state {
+            name
+            type
+            id
+            description
+            color
+        }
+        assignee {
+            id
+            name
+            displayName
+            url
+            email
+        }
+        url
+        identifier
+    }
+}
+
+query State($filter: WorkflowStateFilter) {
+  workflowStates(filter: $filter) {
+    nodes {
+      id
+    }
+  }
+}
+
+mutation IssueUpdate($input: IssueUpdateInput!, $issueId: String!) {
+  issueUpdate(id: $issueId, input: $input) {
+    success
+  }
+}
