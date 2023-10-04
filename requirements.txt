@@ -1,0 +1,4 @@
+PyGithub
+requests
+slack_sdk
+ariadne-codegen

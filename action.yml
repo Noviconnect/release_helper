@@ -1,0 +1,28 @@
+# action.yml
+name: 'release_helper'
+description: 'A tool to check related tickets are in a ready state for deployment.'
+inputs:
+  github-token:
+    description: 'release_helper github token'
+    required: true
+    default: 'NOT_SET'
+  repository:
+    description: 'release_helper repository'
+    required: true
+    default: 'NOT_SET'
+  linear-token:
+    description: 'release_helper linear token'
+    required: true
+    default: 'NOT_SET'
+  slack-bot-token:
+    description: 'release_helper slack bot token'
+    required: true
+    default: 'NOT_SET'
+#outputs:
+#  result:
+#    description: 'release_helper result'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+#  args:
+#    - ${{ inputs.var}}
