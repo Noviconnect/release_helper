@@ -6,19 +6,15 @@ A tool to check related tickets are in a ready state for deployment.
 
 ### `github-token`
 
-**Required** release_helper github token. Default `"NOT_SET"`.
-
-### `repository`
-
-**Required** release_helper repository. Default `"NOT_SET"`.
+**Required** release_helper github token.
 
 ### `linear-token`
 
-**Required** release_helper linear token. Default `"NOT_SET"`.
+**Required** release_helper linear token.
 
 ### `slack-bot-token`
 
-**Required** release_helper slack bot token. Default `"NOT_SET"`.
+**Required** release_helper slack bot token.
 
 
 ## Outputs
@@ -28,10 +24,10 @@ A tool to check related tickets are in a ready state for deployment.
 ## Example usage
 
 ```yaml
-uses: Noviconnect/release_helper@main
-with:
-  github-token: '<your token>'
-  repository: '<repo>'
-  linear-token: '<your token>'
-  slack-bot-token: '<your token>'
+- name: release_helper
+  uses: Noviconnect/release_helper@v1
+  env:
+      HELPER_GITHUB_TOKEN: '${{ github.token }}'
+      HELPER_LINEAR_TOKEN: '${{ secrets.HELPER_LINEAR_TOKEN }}'
+      HELPER_SLACK_BOT_TOKEN: '${{ secrets.HELPER_SLACK_BOT_TOKEN }}'
 ```

@@ -20,7 +20,7 @@ from slack_sdk import WebClient
 def get_draft_release() -> GitRelease:
     g = get_github_client()
 
-    repository = os.environ.get("HELPER_REPOSITORY")
+    repository = os.environ.get("GITHUB_REPOSITORY")
     print(f"Getting data for the {repository} repository")
 
     gh_repository = g.get_repo(repository)

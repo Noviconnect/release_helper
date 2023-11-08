@@ -5,19 +5,12 @@ inputs:
   github-token:
     description: 'release_helper github token'
     required: true
-    default: 'NOT_SET'
-  repository:
-    description: 'release_helper repository'
-    required: true
-    default: 'NOT_SET'
   linear-token:
     description: 'release_helper linear token'
     required: true
-    default: 'NOT_SET'
   slack-bot-token:
     description: 'release_helper slack bot token'
     required: true
-    default: 'NOT_SET'
 
 #outputs:
 #  result:
@@ -28,6 +21,5 @@ runs:
   image: 'Dockerfile'
   env:
     HELPER_GITHUB_TOKEN: ${{ inputs.github-token }}
-    HELPER_REPOSITORY: ${{ inputs.repository }}
     HELPER_LINEAR_TOKEN: ${{ inputs.linear-token }}
     HELPER_SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
