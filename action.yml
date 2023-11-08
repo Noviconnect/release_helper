@@ -1,6 +1,6 @@
-# action.yml
 name: 'release_helper'
 description: 'A tool to check related tickets are in a ready state for deployment.'
+
 inputs:
   github-token:
     description: 'release_helper github token'
@@ -18,11 +18,16 @@ inputs:
     description: 'release_helper slack bot token'
     required: true
     default: 'NOT_SET'
+
 #outputs:
 #  result:
 #    description: 'release_helper result'
+
 runs:
   using: 'docker'
   image: 'Dockerfile'
-#  args:
-#    - ${{ inputs.var}}
+  env:
+    HELPER_GITHUB_TOKEN: ${{ inputs.github-token }}
+    HELPER_REPOSITORY: ${{ inputs.repository }}
+    HELPER_LINEAR_TOKEN: ${{ inputs.linear-token }}
+    HELPER_SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}

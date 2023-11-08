@@ -1,5 +1,13 @@
-FROM python:3.10
+FROM python:3.12
 
-COPY entrypoint.sh /entrypoint.sh
+WORKDIR /
+
+COPY release_helper release_helper/
+
+# setup python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY entrypoint.sh .
 
 ENTRYPOINT ["/entrypoint.sh"]
