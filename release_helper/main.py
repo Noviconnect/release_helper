@@ -158,7 +158,7 @@ def get_linear_client():
     token = os.environ.get("HELPER_LINEAR_TOKEN")
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}",
+        "Authorization": f"{token}",
     }
     linear_client = Client(url="https://api.linear.app/graphql", headers=headers)
     return linear_client
