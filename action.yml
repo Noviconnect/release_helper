@@ -12,7 +12,7 @@ inputs:
     description: 'release_helper slack bot token'
     required: true
   slack-channel-name:
-    description: 'release_helper slack channel name'
+    description: 'release_helper slack channel name, include the #'
     required: true
 
 #outputs:
