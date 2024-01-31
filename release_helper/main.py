@@ -107,8 +107,8 @@ def send_slack_message(release_draft: GitRelease, issues: list[IssueIssue]):
         )
 
     client.chat_postMessage(
-        channel="#deploys",
-        blocks=blocks,
+        channel = os.environ.get("HELPER_SLACK_CHANNEL_NAME"),
+        blocks = blocks,
     )
 
 

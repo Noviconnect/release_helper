@@ -11,6 +11,9 @@ inputs:
   slack-bot-token:
     description: 'release_helper slack bot token'
     required: true
+  slack-channel-name:
+    description: 'release_helper slack channel name'
+    required: true
 
 #outputs:
 #  result:
@@ -23,3 +26,4 @@ runs:
     HELPER_GITHUB_TOKEN: ${{ inputs.github-token }}
     HELPER_LINEAR_TOKEN: ${{ inputs.linear-token }}
     HELPER_SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+    HELPER_SLACK_CHANNEL_NAME: ${{ inputs.slack-channel-name }}
