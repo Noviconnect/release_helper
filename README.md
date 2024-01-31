@@ -32,6 +32,6 @@ A tool to check related tickets are in a ready state for deployment.
   env:
       HELPER_GITHUB_TOKEN: '${{ github.token }}'
       HELPER_LINEAR_TOKEN: '${{ secrets.HELPER_LINEAR_TOKEN }}'
-      HELPER_SLACK_BOT_TOKEN: '${{ secrets.HELPER_SLACK_BOT_TOKEN }}'
+      HELPER_SLACK_BOT_TOKEN: '${{ secrets.SLACK_BOT_TOKEN }}'
       HELPER_SLACK_CHANNEL_NAME: '#production-deploys'
 ```
