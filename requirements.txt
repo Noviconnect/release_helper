@@ -1,5 +1,0 @@
-PyGithub
-requests
-slack_sdk
-ariadne-codegen
-pydantic==1.10.8

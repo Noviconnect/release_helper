@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "release_helper"
+version = "1.1.1"
+description = "A tool to check related tickets are in a ready state for deployment."
+authors = ["jason davila <jason@noviconnect.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+PyGithub = "^2.2.0"
+requests = "^2.31.0"
+slack-sdk = "^3.27.1"
+ariadne-codegen = "^0.1.0"
+pydantic = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
