@@ -1,0 +1,68 @@
+# https://github.com/marketplace/actions/release-drafter
+
+categories:
+  - title: 🚀 Features
+    labels:
+      - feature
+      - enhancement
+  - title: 🐛 Bug Fixes
+    labels:
+      - bug
+  - title: 🧰 Maintenance
+    labels:
+      - chore
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+
+template: |
+  ## Changes
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+  --
+
+  ## Contributors
+
+  $CONTRIBUTORS
+
+name-template: v$RESOLVED_VERSION 🐍
+
+tag-template: v$RESOLVED_VERSION
+
+version-resolver:
+  major:
+    labels:
+      - major
+      - feature
+  minor:
+    labels:
+      - minor
+  patch:
+    labels:
+      - patch
+      - chore
+      - bug
+  default: minor
+
+autolabeler:
+
+  - label: feature
+    title:
+      - /feat/i
+      - /enhancement/i
+      - /perf/i
+
+  - label: bug
+    title:
+      - /fix/i
+      - /revert/i
+
+  - label: chore
+    title:
+      - /docs/i
+      - /style/i
+      - /refactor/i
+      - /ci/i
+      - /chore/i
