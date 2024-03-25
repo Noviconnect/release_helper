@@ -74,13 +74,14 @@ def send_slack_message(release_draft: GitRelease, issues: list[IssueIssue]):
 
     release_title = release_draft.title
     release_url = release_draft.html_url
+    repository = os.environ.get("GITHUB_REPOSITORY")
 
     blocks = [
         {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": f"Draft Release: {release_title}",
+                "text": f"{repository} Draft Release: {release_title}",
                 "emoji": True,
             },
         },
