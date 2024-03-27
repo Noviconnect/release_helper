@@ -73,21 +73,21 @@ def send_slack_message(release_draft: GitRelease, issues: list[IssueIssue]):
     client = WebClient(token=os.environ["HELPER_SLACK_BOT_TOKEN"])
 
     release_title = release_draft.title
-    release_url = release_draft.html_url
-    repository = os.environ.get("GITHUB_REPOSITORY")
+    repository_full = os.environ.get("GITHUB_REPOSITORY")
+    repository = os.environ.get("GITHUB_REPOSITORY").split("/")[1]
 
     blocks = [
         {
             "type": "header",
             "text": {
                 "type": "plain_text",
-                "text": f"{repository} Draft Release: {release_title}",
+                "text": f"{repository} - Draft Release: {release_title}",
                 "emoji": True,
             },
         },
         {
             "type": "context",
-            "elements": [{"type": "mrkdwn", "text": f"<{release_url}|View Release>"}],
+            "elements": [{"type": "mrkdwn", "text": f"<https://github.com/{repository_full}/releases|View Releases>"}],
         },
     ]
 
