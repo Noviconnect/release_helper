@@ -10,12 +10,14 @@ permissions:
 
 jobs:
   update_main_version:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Get tag
+      - name: Update major version tag
         run: |
 
           # get latest tag
@@ -25,22 +27,15 @@ jobs:
           fi
 
           # check if tag matches pattern
-          if [[ $tag =~ v[0-9]+.[0-9]+.[0-9] ]];
+          if [[ $tag =~ v[0-9]+.[0-9]+.[0-9] ]]; then
 
-            echo "Found tag: '${tag}'"
-
-            # minor and patch versions
+            # remove minor and patch versions
             tag=${tag%%.*}
-
-            # get commit of tag
-            prev_commit=$(git rev-parse --short $tag)
-            new_commit=$(git rev-parse --short HEAD)
-            echo "Moving major tag: '${tag}' from commit: '${prev_commit}' to commit: '${new_commit}'
 
             # push new major version tag
             git tag --force $tag
             git push origin $tag --force
             echo "Successfully moved tag: '${tag}'"
           else
-            echo "The tag: '${tag}' does not match expected pattern of 'vX.X.X', exiting..."; exit 1
+            echo "The tag: '${tag}' does not match expected pattern of 'v\d+.\d+.\d', exiting..."; exit 1
           fi
