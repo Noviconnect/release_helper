@@ -1,0 +1,41 @@
+name: Update major version tag
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: read
+
+jobs:
+  update_main_version:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update major version tag
+        run: |
+
+          # get latest tag
+          tag=$(git describe --tags --abbrev=0)
+          if [[ $? -ne 0 ]]; then
+            echo "No tag found, exiting..."; exit 1
+          fi
+
+          # check if tag matches pattern
+          if [[ $tag =~ v[0-9]+.[0-9]+.[0-9] ]]; then
+
+            # remove minor and patch versions
+            tag=${tag%%.*}
+
+            # push new major version tag
+            git tag --force $tag
+            git push origin $tag --force
+            echo "Successfully moved tag: '${tag}'"
+          else
+            echo "The tag: '${tag}' does not match expected pattern of 'v\d+.\d+.\d', exiting..."; exit 1
+          fi
