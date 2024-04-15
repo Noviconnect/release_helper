@@ -52,12 +52,11 @@ ignore = [# https://docs.astral.sh/ruff/settings/#lint_ignore
     "ISC001",
     "ISC002",
     "E501",
-
     # Manually added
     "ANN101", # Missing type annotation for self in method
     "D102", # Missing docstring in public method
-"RET504", # Missing return type annotation
-"D107", # Missing docstring in __init__
+    "RET504", # Missing return type annotation
+    "D107", # Missing docstring in __init__
     "D101", # Missing docstring in public class
     "ANN204", # Missing type annotation for self in method
     "D100", # Missing docstring in public module
