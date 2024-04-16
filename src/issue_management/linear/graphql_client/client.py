@@ -2,14 +2,8 @@
 # Source: queries.graphql
 
 from .base_client import BaseClient
-from .base_model import (
-    UNSET,
-    UnsetType
-)
-from .input_types import (
-    IssueUpdateInput,
-    WorkflowStateFilter
-)
+from .base_model import UNSET, UnsetType
+from .input_types import IssueUpdateInput, WorkflowStateFilter
 from .issue import Issue
 from .issue_update import IssueUpdate
 from .state import State

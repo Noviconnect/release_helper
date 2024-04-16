@@ -1,6 +1,6 @@
 # https://docs.astral.sh/ruff/settings/#exclude
 exclude = [
-    "release_helper/graphql_client",
+    "src/issue_management/linear/graphql_client",
 ]
 
 line-length = 88 # https://docs.astral.sh/ruff/settings/#line-length

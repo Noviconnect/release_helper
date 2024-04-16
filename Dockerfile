@@ -23,7 +23,8 @@ COPY --from=build /wheels-base/  /wheels/
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
     && rm -rf /wheels/
 
-COPY release_helper/ /release_helper/
-COPY entrypoint.sh .
+WORKDIR /release_helper
 
-ENTRYPOINT ["/entrypoint.sh"]
+COPY src/ ./
+
+ENTRYPOINT ["python", "main.py"]

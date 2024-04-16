@@ -22,14 +22,14 @@ from .enums import (
     ViewType,
     WorkflowTrigger,
     WorkflowTriggerType,
-    WorkflowType
+    WorkflowType,
 )
 from .exceptions import (
     GraphQLClientError,
     GraphQLClientGraphQLError,
     GraphQLClientGraphQLMultiError,
     GraphQLClientHttpError,
-    GraphQlClientInvalidResponseError
+    GraphQlClientInvalidResponseError,
 )
 from .input_types import (
     AirbyteConfigurationInput,
@@ -160,23 +160,11 @@ from .input_types import (
     WorkflowStateCreateInput,
     WorkflowStateFilter,
     WorkflowStateUpdateInput,
-    ZendeskSettingsInput
+    ZendeskSettingsInput,
 )
-from .issue import (
-    Issue,
-    IssueIssue,
-    IssueIssueAssignee,
-    IssueIssueState
-)
-from .issue_update import (
-    IssueUpdate,
-    IssueUpdateIssueUpdate
-)
-from .state import (
-    State,
-    StateWorkflowStates,
-    StateWorkflowStatesNodes
-)
+from .issue import Issue, IssueIssue, IssueIssueAssignee, IssueIssueState
+from .issue_update import IssueUpdate, IssueUpdateIssueUpdate
+from .state import State, StateWorkflowStates, StateWorkflowStatesNodes
 
 
 __all__ = [

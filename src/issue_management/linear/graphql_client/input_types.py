@@ -2,10 +2,7 @@
 # Source: schema.graphql
 
 # Standard Library
-from typing import (
-    Any,
-    Optional
-)
+from typing import Any, Optional
 
 # Third Party
 from pydantic import Field
@@ -21,7 +18,7 @@ from .enums import (
     SlaStatus,
     UserRoleType,
     ViewPreferencesType,
-    ViewType
+    ViewType,
 )
 
 
@@ -42,17 +39,29 @@ class SamlConfigurationInput(BaseModel):
 class IntercomSettingsInput(BaseModel):
     send_note_on_status_change: bool | None = Field(alias="sendNoteOnStatusChange")
     send_note_on_comment: bool | None = Field(alias="sendNoteOnComment")
-    automate_ticket_reopening_on_completion: bool | None = Field(alias="automateTicketReopeningOnCompletion")
-    automate_ticket_reopening_on_cancellation: bool | None = Field(alias="automateTicketReopeningOnCancellation")
-    automate_ticket_reopening_on_comment: bool | None = Field(alias="automateTicketReopeningOnComment")
+    automate_ticket_reopening_on_completion: bool | None = Field(
+        alias="automateTicketReopeningOnCompletion"
+    )
+    automate_ticket_reopening_on_cancellation: bool | None = Field(
+        alias="automateTicketReopeningOnCancellation"
+    )
+    automate_ticket_reopening_on_comment: bool | None = Field(
+        alias="automateTicketReopeningOnComment"
+    )
 
 
 class FrontSettingsInput(BaseModel):
     send_note_on_status_change: bool | None = Field(alias="sendNoteOnStatusChange")
     send_note_on_comment: bool | None = Field(alias="sendNoteOnComment")
-    automate_ticket_reopening_on_completion: bool | None = Field(alias="automateTicketReopeningOnCompletion")
-    automate_ticket_reopening_on_cancellation: bool | None = Field(alias="automateTicketReopeningOnCancellation")
-    automate_ticket_reopening_on_comment: bool | None = Field(alias="automateTicketReopeningOnComment")
+    automate_ticket_reopening_on_completion: bool | None = Field(
+        alias="automateTicketReopeningOnCompletion"
+    )
+    automate_ticket_reopening_on_cancellation: bool | None = Field(
+        alias="automateTicketReopeningOnCancellation"
+    )
+    automate_ticket_reopening_on_comment: bool | None = Field(
+        alias="automateTicketReopeningOnComment"
+    )
 
 
 class SlackPostSettingsInput(BaseModel):
@@ -85,7 +94,9 @@ class JiraLinearMappingInput(BaseModel):
 
 
 class JiraSettingsInput(BaseModel):
-    project_mapping: list["JiraLinearMappingInput"] | None = Field(alias="projectMapping")
+    project_mapping: list["JiraLinearMappingInput"] | None = Field(
+        alias="projectMapping"
+    )
     projects: list["JiraProjectDataInput"]
 
 
@@ -101,9 +112,15 @@ class SentrySettingsInput(BaseModel):
 class ZendeskSettingsInput(BaseModel):
     send_note_on_status_change: bool | None = Field(alias="sendNoteOnStatusChange")
     send_note_on_comment: bool | None = Field(alias="sendNoteOnComment")
-    automate_ticket_reopening_on_completion: bool | None = Field(alias="automateTicketReopeningOnCompletion")
-    automate_ticket_reopening_on_cancellation: bool | None = Field(alias="automateTicketReopeningOnCancellation")
-    automate_ticket_reopening_on_comment: bool | None = Field(alias="automateTicketReopeningOnComment")
+    automate_ticket_reopening_on_completion: bool | None = Field(
+        alias="automateTicketReopeningOnCompletion"
+    )
+    automate_ticket_reopening_on_cancellation: bool | None = Field(
+        alias="automateTicketReopeningOnCancellation"
+    )
+    automate_ticket_reopening_on_comment: bool | None = Field(
+        alias="automateTicketReopeningOnComment"
+    )
     subdomain: str
     url: str
     bot_user_id: str | None = Field(alias="botUserId")
@@ -111,8 +128,12 @@ class ZendeskSettingsInput(BaseModel):
 
 class IntegrationSettingsInput(BaseModel):
     slack_post: Optional["SlackPostSettingsInput"] = Field(alias="slackPost")
-    slack_project_post: Optional["SlackPostSettingsInput"] = Field(alias="slackProjectPost")
-    slack_org_project_updates_post: Optional["SlackPostSettingsInput"] = Field(alias="slackOrgProjectUpdatesPost")
+    slack_project_post: Optional["SlackPostSettingsInput"] = Field(
+        alias="slackProjectPost"
+    )
+    slack_org_project_updates_post: Optional["SlackPostSettingsInput"] = Field(
+        alias="slackOrgProjectUpdatesPost"
+    )
     google_sheets: Optional["GoogleSheetsSettingsInput"] = Field(alias="googleSheets")
     git_hub: Optional["GitHubSettingsInput"] = Field(alias="gitHub")
     sentry: Optional["SentrySettingsInput"]
@@ -601,7 +622,9 @@ class NullableIssueFilter(BaseModel):
     labels: Optional["IssueLabelCollectionFilter"]
     subscribers: Optional["UserCollectionFilter"]
     team: Optional["TeamFilter"]
-    project_milestone: Optional["NullableProjectMilestoneFilter"] = Field(alias="projectMilestone")
+    project_milestone: Optional["NullableProjectMilestoneFilter"] = Field(
+        alias="projectMilestone"
+    )
     comments: Optional["CommentCollectionFilter"]
     cycle: Optional["NullableCycleFilter"]
     project: Optional["NullableProjectFilter"]
@@ -609,10 +632,18 @@ class NullableIssueFilter(BaseModel):
     children: Optional["IssueCollectionFilter"]
     attachments: Optional["AttachmentCollectionFilter"]
     searchable_content: Optional["ContentComparator"] = Field(alias="searchableContent")
-    has_related_relations: Optional["RelationExistsComparator"] = Field(alias="hasRelatedRelations")
-    has_duplicate_relations: Optional["RelationExistsComparator"] = Field(alias="hasDuplicateRelations")
-    has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(alias="hasBlockedByRelations")
-    has_blocking_relations: Optional["RelationExistsComparator"] = Field(alias="hasBlockingRelations")
+    has_related_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasRelatedRelations"
+    )
+    has_duplicate_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasDuplicateRelations"
+    )
+    has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasBlockedByRelations"
+    )
+    has_blocking_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasBlockingRelations"
+    )
     sla_status: Optional["SlaStatusComparator"] = Field(alias="slaStatus")
     null: bool | None
     and_: list["NullableIssueFilter"] | None = Field(alias="and")
@@ -643,7 +674,9 @@ class IssueFilter(BaseModel):
     labels: Optional["IssueLabelCollectionFilter"]
     subscribers: Optional["UserCollectionFilter"]
     team: Optional["TeamFilter"]
-    project_milestone: Optional["NullableProjectMilestoneFilter"] = Field(alias="projectMilestone")
+    project_milestone: Optional["NullableProjectMilestoneFilter"] = Field(
+        alias="projectMilestone"
+    )
     comments: Optional["CommentCollectionFilter"]
     cycle: Optional["NullableCycleFilter"]
     project: Optional["NullableProjectFilter"]
@@ -651,10 +684,18 @@ class IssueFilter(BaseModel):
     children: Optional["IssueCollectionFilter"]
     attachments: Optional["AttachmentCollectionFilter"]
     searchable_content: Optional["ContentComparator"] = Field(alias="searchableContent")
-    has_related_relations: Optional["RelationExistsComparator"] = Field(alias="hasRelatedRelations")
-    has_duplicate_relations: Optional["RelationExistsComparator"] = Field(alias="hasDuplicateRelations")
-    has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(alias="hasBlockedByRelations")
-    has_blocking_relations: Optional["RelationExistsComparator"] = Field(alias="hasBlockingRelations")
+    has_related_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasRelatedRelations"
+    )
+    has_duplicate_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasDuplicateRelations"
+    )
+    has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasBlockedByRelations"
+    )
+    has_blocking_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasBlockingRelations"
+    )
     sla_status: Optional["SlaStatusComparator"] = Field(alias="slaStatus")
     and_: list["IssueFilter"] | None = Field(alias="and")
     or_: list["IssueFilter"] | None = Field(alias="or")
@@ -684,7 +725,9 @@ class IssueCollectionFilter(BaseModel):
     labels: Optional["IssueLabelCollectionFilter"]
     subscribers: Optional["UserCollectionFilter"]
     team: Optional["TeamFilter"]
-    project_milestone: Optional["NullableProjectMilestoneFilter"] = Field(alias="projectMilestone")
+    project_milestone: Optional["NullableProjectMilestoneFilter"] = Field(
+        alias="projectMilestone"
+    )
     comments: Optional["CommentCollectionFilter"]
     cycle: Optional["NullableCycleFilter"]
     project: Optional["NullableProjectFilter"]
@@ -692,10 +735,18 @@ class IssueCollectionFilter(BaseModel):
     children: Optional["IssueCollectionFilter"]
     attachments: Optional["AttachmentCollectionFilter"]
     searchable_content: Optional["ContentComparator"] = Field(alias="searchableContent")
-    has_related_relations: Optional["RelationExistsComparator"] = Field(alias="hasRelatedRelations")
-    has_duplicate_relations: Optional["RelationExistsComparator"] = Field(alias="hasDuplicateRelations")
-    has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(alias="hasBlockedByRelations")
-    has_blocking_relations: Optional["RelationExistsComparator"] = Field(alias="hasBlockingRelations")
+    has_related_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasRelatedRelations"
+    )
+    has_duplicate_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasDuplicateRelations"
+    )
+    has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasBlockedByRelations"
+    )
+    has_blocking_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasBlockingRelations"
+    )
     sla_status: Optional["SlaStatusComparator"] = Field(alias="slaStatus")
     and_: list["IssueCollectionFilter"] | None = Field(alias="and")
     or_: list["IssueCollectionFilter"] | None = Field(alias="or")
@@ -948,11 +999,19 @@ class AirbyteConfigurationInput(BaseModel):
 class IntegrationsSettingsCreateInput(BaseModel):
     slack_issue_created: bool | None = Field(alias="slackIssueCreated")
     slack_issue_new_comment: bool | None = Field(alias="slackIssueNewComment")
-    slack_issue_status_changed_done: bool | None = Field(alias="slackIssueStatusChangedDone")
-    slack_issue_status_changed_all: bool | None = Field(alias="slackIssueStatusChangedAll")
+    slack_issue_status_changed_done: bool | None = Field(
+        alias="slackIssueStatusChangedDone"
+    )
+    slack_issue_status_changed_all: bool | None = Field(
+        alias="slackIssueStatusChangedAll"
+    )
     slack_project_update_created: bool | None = Field(alias="slackProjectUpdateCreated")
-    slack_project_update_created_to_team: bool | None = Field(alias="slackProjectUpdateCreatedToTeam")
-    slack_project_update_created_to_workspace: bool | None = Field(alias="slackProjectUpdateCreatedToWorkspace")
+    slack_project_update_created_to_team: bool | None = Field(
+        alias="slackProjectUpdateCreatedToTeam"
+    )
+    slack_project_update_created_to_workspace: bool | None = Field(
+        alias="slackProjectUpdateCreatedToWorkspace"
+    )
     slack_issue_added_to_triage: bool | None = Field(alias="slackIssueAddedToTriage")
     slack_issue_sla_high_risk: bool | None = Field(alias="slackIssueSlaHighRisk")
     slack_issue_sla_breached: bool | None = Field(alias="slackIssueSlaBreached")
@@ -964,11 +1023,19 @@ class IntegrationsSettingsCreateInput(BaseModel):
 class IntegrationsSettingsUpdateInput(BaseModel):
     slack_issue_created: bool | None = Field(alias="slackIssueCreated")
     slack_issue_new_comment: bool | None = Field(alias="slackIssueNewComment")
-    slack_issue_status_changed_done: bool | None = Field(alias="slackIssueStatusChangedDone")
-    slack_issue_status_changed_all: bool | None = Field(alias="slackIssueStatusChangedAll")
+    slack_issue_status_changed_done: bool | None = Field(
+        alias="slackIssueStatusChangedDone"
+    )
+    slack_issue_status_changed_all: bool | None = Field(
+        alias="slackIssueStatusChangedAll"
+    )
     slack_project_update_created: bool | None = Field(alias="slackProjectUpdateCreated")
-    slack_project_update_created_to_team: bool | None = Field(alias="slackProjectUpdateCreatedToTeam")
-    slack_project_update_created_to_workspace: bool | None = Field(alias="slackProjectUpdateCreatedToWorkspace")
+    slack_project_update_created_to_team: bool | None = Field(
+        alias="slackProjectUpdateCreatedToTeam"
+    )
+    slack_project_update_created_to_workspace: bool | None = Field(
+        alias="slackProjectUpdateCreatedToWorkspace"
+    )
     slack_issue_added_to_triage: bool | None = Field(alias="slackIssueAddedToTriage")
     slack_issue_sla_high_risk: bool | None = Field(alias="slackIssueSlaHighRisk")
     slack_issue_sla_breached: bool | None = Field(alias="slackIssueSlaBreached")
@@ -1075,13 +1142,21 @@ class NotificationSubscriptionCreateInput(BaseModel):
     id: str | None
     team_id: str | None = Field(alias="teamId")
     project_id: str | None = Field(alias="projectId")
-    project_notification_subscription_type: None | (ProjectNotificationSubscriptionType) = Field(alias="projectNotificationSubscriptionType")
-    team_notification_subscription_types: list[str] | None = Field(alias="teamNotificationSubscriptionTypes")
+    project_notification_subscription_type: None | (
+        ProjectNotificationSubscriptionType
+    ) = Field(alias="projectNotificationSubscriptionType")
+    team_notification_subscription_types: list[str] | None = Field(
+        alias="teamNotificationSubscriptionTypes"
+    )
 
 
 class NotificationSubscriptionUpdateInput(BaseModel):
-    project_notification_subscription_type: None | (ProjectNotificationSubscriptionType) = Field(alias="projectNotificationSubscriptionType")
-    team_notification_subscription_types: list[str] | None = Field(alias="teamNotificationSubscriptionTypes")
+    project_notification_subscription_type: None | (
+        ProjectNotificationSubscriptionType
+    ) = Field(alias="projectNotificationSubscriptionType")
+    team_notification_subscription_types: list[str] | None = Field(
+        alias="teamNotificationSubscriptionTypes"
+    )
 
 
 class OrganizationDomainCreateInput(BaseModel):
@@ -1113,13 +1188,23 @@ class UpdateOrganizationInput(BaseModel):
     logo_url: str | None = Field(alias="logoUrl")
     url_key: str | None = Field(alias="urlKey")
     git_branch_format: str | None = Field(alias="gitBranchFormat")
-    git_linkback_messages_enabled: bool | None = Field(alias="gitLinkbackMessagesEnabled")
-    git_public_linkback_messages_enabled: bool | None = Field(alias="gitPublicLinkbackMessagesEnabled")
+    git_linkback_messages_enabled: bool | None = Field(
+        alias="gitLinkbackMessagesEnabled"
+    )
+    git_public_linkback_messages_enabled: bool | None = Field(
+        alias="gitPublicLinkbackMessagesEnabled"
+    )
     roadmap_enabled: bool | None = Field(alias="roadmapEnabled")
-    project_updates_reminder_frequency: None | (ProjectUpdateReminderFrequency) = Field(alias="projectUpdatesReminderFrequency")
+    project_updates_reminder_frequency: None | (
+        ProjectUpdateReminderFrequency
+    ) = Field(alias="projectUpdatesReminderFrequency")
     project_update_reminders_day: Day | None = Field(alias="projectUpdateRemindersDay")
-    project_update_reminders_hour: float | None = Field(alias="projectUpdateRemindersHour")
-    reduced_personal_information: bool | None = Field(alias="reducedPersonalInformation")
+    project_update_reminders_hour: float | None = Field(
+        alias="projectUpdateRemindersHour"
+    )
+    reduced_personal_information: bool | None = Field(
+        alias="reducedPersonalInformation"
+    )
     oauth_app_review: bool | None = Field(alias="oauthAppReview")
     linear_preview_flags: Any | None = Field(alias="linearPreviewFlags")
     allowed_auth_services: list[str] | None = Field(alias="allowedAuthServices")
@@ -1183,7 +1268,9 @@ class ProjectUpdateInput(BaseModel):
     icon: str | None
     color: str | None
     team_ids: list[str] | None = Field(alias="teamIds")
-    project_update_reminders_paused_until_at: Any | None = Field(alias="projectUpdateRemindersPausedUntilAt")
+    project_update_reminders_paused_until_at: Any | None = Field(
+        alias="projectUpdateRemindersPausedUntilAt"
+    )
     lead_id: str | None = Field(alias="leadId")
     member_ids: list[str] | None = Field(alias="memberIds")
     start_date: Any | None = Field(alias="startDate")
@@ -1283,27 +1370,43 @@ class TeamCreateInput(BaseModel):
     cycle_start_day: float | None = Field(alias="cycleStartDay")
     cycle_duration: int | None = Field(alias="cycleDuration")
     cycle_cooldown_time: int | None = Field(alias="cycleCooldownTime")
-    cycle_issue_auto_assign_started: bool | None = Field(alias="cycleIssueAutoAssignStarted")
-    cycle_issue_auto_assign_completed: bool | None = Field(alias="cycleIssueAutoAssignCompleted")
+    cycle_issue_auto_assign_started: bool | None = Field(
+        alias="cycleIssueAutoAssignStarted"
+    )
+    cycle_issue_auto_assign_completed: bool | None = Field(
+        alias="cycleIssueAutoAssignCompleted"
+    )
     cycle_lock_to_active: bool | None = Field(alias="cycleLockToActive")
     upcoming_cycle_count: float | None = Field(alias="upcomingCycleCount")
     triage_enabled: bool | None = Field(alias="triageEnabled")
-    require_priority_to_leave_triage: bool | None = Field(alias="requirePriorityToLeaveTriage")
+    require_priority_to_leave_triage: bool | None = Field(
+        alias="requirePriorityToLeaveTriage"
+    )
     timezone: str | None
-    issue_ordering_no_priority_first: bool | None = Field(alias="issueOrderingNoPriorityFirst")
+    issue_ordering_no_priority_first: bool | None = Field(
+        alias="issueOrderingNoPriorityFirst"
+    )
     issue_estimation_type: str | None = Field(alias="issueEstimationType")
     issue_estimation_allow_zero: bool | None = Field(alias="issueEstimationAllowZero")
-    issue_sort_order_default_to_bottom: bool | None = Field(alias="issueSortOrderDefaultToBottom")
+    issue_sort_order_default_to_bottom: bool | None = Field(
+        alias="issueSortOrderDefaultToBottom"
+    )
     issue_estimation_extended: bool | None = Field(alias="issueEstimationExtended")
     default_issue_estimate: float | None = Field(alias="defaultIssueEstimate")
     group_issue_history: bool | None = Field(alias="groupIssueHistory")
-    default_template_for_members_id: str | None = Field(alias="defaultTemplateForMembersId")
-    default_template_for_non_members_id: str | None = Field(alias="defaultTemplateForNonMembersId")
+    default_template_for_members_id: str | None = Field(
+        alias="defaultTemplateForMembersId"
+    )
+    default_template_for_non_members_id: str | None = Field(
+        alias="defaultTemplateForNonMembersId"
+    )
     private: bool | None
     auto_close_period: float | None = Field(alias="autoClosePeriod")
     auto_close_state_id: str | None = Field(alias="autoCloseStateId")
     auto_archive_period: float | None = Field(alias="autoArchivePeriod")
-    marked_as_duplicate_workflow_state_id: str | None = Field(alias="markedAsDuplicateWorkflowStateId")
+    marked_as_duplicate_workflow_state_id: str | None = Field(
+        alias="markedAsDuplicateWorkflowStateId"
+    )
 
 
 class TeamUpdateInput(BaseModel):
@@ -1316,16 +1419,24 @@ class TeamUpdateInput(BaseModel):
     cycle_start_day: float | None = Field(alias="cycleStartDay")
     cycle_duration: int | None = Field(alias="cycleDuration")
     cycle_cooldown_time: int | None = Field(alias="cycleCooldownTime")
-    cycle_issue_auto_assign_started: bool | None = Field(alias="cycleIssueAutoAssignStarted")
-    cycle_issue_auto_assign_completed: bool | None = Field(alias="cycleIssueAutoAssignCompleted")
+    cycle_issue_auto_assign_started: bool | None = Field(
+        alias="cycleIssueAutoAssignStarted"
+    )
+    cycle_issue_auto_assign_completed: bool | None = Field(
+        alias="cycleIssueAutoAssignCompleted"
+    )
     cycle_lock_to_active: bool | None = Field(alias="cycleLockToActive")
     cycle_enabled_start_week: str | None = Field(alias="cycleEnabledStartWeek")
     upcoming_cycle_count: float | None = Field(alias="upcomingCycleCount")
     timezone: str | None
-    issue_ordering_no_priority_first: bool | None = Field(alias="issueOrderingNoPriorityFirst")
+    issue_ordering_no_priority_first: bool | None = Field(
+        alias="issueOrderingNoPriorityFirst"
+    )
     issue_estimation_type: str | None = Field(alias="issueEstimationType")
     issue_estimation_allow_zero: bool | None = Field(alias="issueEstimationAllowZero")
-    issue_sort_order_default_to_bottom: bool | None = Field(alias="issueSortOrderDefaultToBottom")
+    issue_sort_order_default_to_bottom: bool | None = Field(
+        alias="issueSortOrderDefaultToBottom"
+    )
     issue_estimation_extended: bool | None = Field(alias="issueEstimationExtended")
     default_issue_estimate: float | None = Field(alias="defaultIssueEstimate")
     draft_workflow_state_id: str | None = Field(alias="draftWorkflowStateId")
@@ -1336,16 +1447,24 @@ class TeamUpdateInput(BaseModel):
     slack_issue_comments: bool | None = Field(alias="slackIssueComments")
     slack_issue_statuses: bool | None = Field(alias="slackIssueStatuses")
     group_issue_history: bool | None = Field(alias="groupIssueHistory")
-    default_template_for_members_id: str | None = Field(alias="defaultTemplateForMembersId")
-    default_template_for_non_members_id: str | None = Field(alias="defaultTemplateForNonMembersId")
+    default_template_for_members_id: str | None = Field(
+        alias="defaultTemplateForMembersId"
+    )
+    default_template_for_non_members_id: str | None = Field(
+        alias="defaultTemplateForNonMembersId"
+    )
     private: bool | None
     triage_enabled: bool | None = Field(alias="triageEnabled")
-    require_priority_to_leave_triage: bool | None = Field(alias="requirePriorityToLeaveTriage")
+    require_priority_to_leave_triage: bool | None = Field(
+        alias="requirePriorityToLeaveTriage"
+    )
     default_issue_state_id: str | None = Field(alias="defaultIssueStateId")
     auto_close_period: float | None = Field(alias="autoClosePeriod")
     auto_close_state_id: str | None = Field(alias="autoCloseStateId")
     auto_archive_period: float | None = Field(alias="autoArchivePeriod")
-    marked_as_duplicate_workflow_state_id: str | None = Field(alias="markedAsDuplicateWorkflowStateId")
+    marked_as_duplicate_workflow_state_id: str | None = Field(
+        alias="markedAsDuplicateWorkflowStateId"
+    )
 
 
 class TemplateCreateInput(BaseModel):

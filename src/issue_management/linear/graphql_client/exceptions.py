@@ -66,7 +66,9 @@ class GraphQLClientGraphQLMultiError(GraphQLClientError):
         return "; ".join(str(e) for e in self.errors)
 
     @classmethod
-    def from_errors_dicts(cls, errors_dicts: list[dict[str, Any]], data: dict[str, Any]) -> "GraphQLClientGraphQLMultiError":
+    def from_errors_dicts(
+        cls, errors_dicts: list[dict[str, Any]], data: dict[str, Any]
+    ) -> "GraphQLClientGraphQLMultiError":
         return cls(
             errors=[GraphQLClientGraphQLError.from_dict(e) for e in errors_dicts],
             data=data,
