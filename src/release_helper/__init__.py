@@ -1,10 +1,10 @@
 import logging
 from typing import TYPE_CHECKING
 
+from issue_management.linear import IssueManagementLinear
+from messaging.slack import MessagingSlack
 from release_helper.exceptions import ReleaseHelperError
-from release_helper.github import SourceControlGithub
-from release_helper.linear import IssueManagementLinear
-from release_helper.slack import MessagingSlack
+from source_control.github import SourceControlGithub
 
 
 if TYPE_CHECKING:
@@ -43,7 +43,3 @@ def process_potential_release() -> None:
     else:
         slack.send_errors(errors)
         logger.info("Errors found. Not deploying.")
-
-
-if __name__ == "__main__":
-    process_potential_release()

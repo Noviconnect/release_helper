@@ -3,7 +3,6 @@ import os
 import re
 
 from github import Github, GitRelease
-
 from release_helper.exceptions import ReleaseHelperError
 
 
