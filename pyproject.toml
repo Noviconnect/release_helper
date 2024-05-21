@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 PyGithub = "^2.2.0"
-requests = "^2.31.0"
+requests = "^2.32.0"
 slack-sdk = "^3.27.1"
 ariadne-codegen = "^0.1.0"
 pydantic = "^1.0.0"
