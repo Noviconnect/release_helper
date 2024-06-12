@@ -23,9 +23,6 @@ COPY --from=build /wheels-base/  /wheels/
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
     && rm -rf /wheels/
 
-WORKDIR /app
-COPY . .
+COPY entrypoint.sh /entrypoint.sh
 
-ENV PYTHONPATH "${PYTHONPATH}:/app"
-
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["/entrypoint.sh"]
