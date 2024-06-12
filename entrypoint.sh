@@ -13,11 +13,13 @@ set -o pipefail
 # Print commands and their arguments as they are executed
 #set -o xtrace
 
+cd /github
+
 echo "****** Current Directory ******"
 pwd
 
 echo "****** Listing files ******"
-ls -la
+ls -laR
 
 echo "****** Environment Variables ******"
 env
