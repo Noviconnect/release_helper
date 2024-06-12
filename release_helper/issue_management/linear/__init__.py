@@ -2,16 +2,15 @@ from __future__ import annotations
 
 import os
 
-from graphql_client import (
+from release_helper.exceptions import IssueError, ReleaseHelperError
+from release_helper.issue_management.linear.graphql_client import (
     Client,
+    GraphQLClientGraphQLMultiError,
     IssueIssue,
     IssueUpdateInput,
     StringComparator,
     WorkflowStateFilter,
 )
-
-from release_helper.exceptions import IssueError, ReleaseHelperError
-from release_helper.graphql_client import GraphQLClientGraphQLMultiError
 
 
 class IssueManagementLinear:

@@ -2,12 +2,5 @@ services:
 
   release_helper:
     build:
-      args:
-        - revision=${GITHUB_SHA:-unknown}
       context: .
-      labels:
-        org.opencontainers.image.revision: ${GITHUB_SHA:-unknown}
-        org.opencontainers.image.source: github.com/Noviconnect/release_helper
       target: final
-    command: /entrypoint.sh
-    image: release_helper

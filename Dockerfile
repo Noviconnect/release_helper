@@ -23,7 +23,9 @@ COPY --from=build /wheels-base/  /wheels/
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
     && rm -rf /wheels/
 
-COPY release_helper/ /release_helper/
-COPY entrypoint.sh .
+WORKDIR /app
+COPY . .
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENV PYTHONPATH "${PYTHONPATH}:/app"
+
+ENTRYPOINT ["python", "main.py"]
