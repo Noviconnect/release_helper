@@ -2,9 +2,9 @@ import logging
 from typing import TYPE_CHECKING
 
 from release_helper.exceptions import ReleaseHelperError
-from release_helper.github import SourceControlGithub
-from release_helper.linear import IssueManagementLinear
-from release_helper.slack import MessagingSlack
+from release_helper.issue_management.linear import IssueManagementLinear
+from release_helper.messaging.slack import MessagingSlack
+from release_helper.source_control.github import SourceControlGithub
 
 
 if TYPE_CHECKING:

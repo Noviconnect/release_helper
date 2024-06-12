@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    import graphql_client
     from github.GitRelease import GitRelease
 
     from release_helper.exceptions import ReleaseHelperError
+    from release_helper.issue_management.linear import graphql_client
 
 import slack_sdk.web
 from slack_sdk import WebClient
@@ -22,7 +22,7 @@ class MessagingSlack:
     def get_client() -> WebClient:
         return WebClient(token=os.environ["HELPER_SLACK_BOT_TOKEN"])
 
-    def send_blocks(self, blocks: dict[str, str]) -> None:
+    def send_blocks(self, blocks: list[dict]) -> None:
         self.client.chat_postMessage(
             channel=os.environ.get("HELPER_SLACK_CHANNEL_NAME"),
             blocks=blocks,
