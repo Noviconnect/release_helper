@@ -27,3 +27,7 @@ runs:
     HELPER_LINEAR_TOKEN: ${{ inputs.linear-token }}
     HELPER_SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
     HELPER_SLACK_CHANNEL_NAME: ${{ inputs.slack-channel-name }}
+
+branding:
+    color: 'blue'
+    icon: 'play-circle'
