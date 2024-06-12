@@ -4,3 +4,4 @@ services:
     build:
       context: .
       target: final
+    image: release_helper
