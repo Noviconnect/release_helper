@@ -11,6 +11,7 @@ python = "^3.12"
 PyGithub = "^2.3.0"
 requests = "^2.32.3"
 slack-sdk = "^3.28.0"
+pydantic = "^2.7.4"
 
 
 [tool.poetry.group.development.dependencies]
