@@ -13,16 +13,7 @@ set -o pipefail
 # Print commands and their arguments as they are executed
 #set -o xtrace
 
-cd /app
-
-echo "****** Current Directory ******"
-pwd
-
-echo "****** Listing files ******"
-ls -laR
-
-echo "****** Environment Variables ******"
-env
-
 export PYTHONPATH=/app
+
+cd /app
 python main.py
