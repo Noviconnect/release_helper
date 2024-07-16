@@ -5,3 +5,10 @@ services:
       context: .
       target: final
     image: release_helper
+
+  codegen:
+    build:
+      context: .
+      target: codegen
+    volumes:
+      - .:/app

@@ -58,7 +58,7 @@ function clean() {
 }
 
 function build() {
-  docker-compose build
+  docker compose build
 }
 
 function install() {
@@ -66,7 +66,7 @@ function install() {
 }
 
 function generate-linear-client() {
-  ariadne-codegen --config release_helper/issue_management/linear/graphql_generator.toml client
+  docker compose run --rm --build codegen ariadne-codegen --config release_helper/issue_management/linear/graphql_generator.toml client
 }
 
 function help() {

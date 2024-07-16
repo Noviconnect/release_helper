@@ -29,3 +29,9 @@ COPY . .
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+FROM python:3.12 as codegen
+
+RUN pip install --no-cache-dir ariadne-codegen
+
+WORKDIR /app/release_helper/issue_management/linear
