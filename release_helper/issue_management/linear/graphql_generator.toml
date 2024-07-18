@@ -1,5 +1,5 @@
 [tool.ariadne-codegen]
-schema_path = "release_helper/issue_management/linear/schema.graphql"
-queries_path="release_helper/issue_management/linear/queries.graphql"
+schema_path = "schema.graphql"
+queries_path="queries.graphql"
 async_client = false
-target_package_path = "release_helper/issue_management/linear"
+target_package_path = ""
