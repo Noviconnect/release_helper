@@ -108,6 +108,7 @@ Currently, there are no specific test commands defined in the taskfile. It's rec
 
 The project uses Ruff for linting and formatting. The configuration can be found in `ruff.toml`. To run linting and formatting:
 
-1. Install Ruff: `pip install ruff`
-2. Run linter: `ruff check .`
-3. Run formatter: `ruff format .`
+1. Activate the virtual environment: `poetry shell`
+2. Install Ruff: `pip install ruff`
+3. Run linter: `ruff check .`
+4. Run formatter: `ruff format .`
