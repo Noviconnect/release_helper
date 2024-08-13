@@ -9,9 +9,9 @@ set -o nounset
 # Consider a pipeline to fail if any of the commands fail
 set -o pipefail
 # Print shell input lines as they are read
-#set -o verbose
+# set -o verbose
 # Print commands and their arguments as they are executed
-#set -o xtrace
+# set -o xtrace
 
 export PYTHONPATH=/app
 

@@ -10,6 +10,7 @@ from release_helper.source_control.github import SourceControlGithub
 if TYPE_CHECKING:
     from github import GitRelease
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

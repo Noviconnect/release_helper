@@ -27,7 +27,7 @@ class BaseClient:
         self.url = url
         self.headers = headers
 
-        self.http_client = http_client if http_client else httpx.Client(headers=headers)
+        self.http_client = http_client if http_client else httpx.Client(headers=headers, timeout=httpx.Timeout(30))
 
     def __enter__(self: Self) -> Self:
         return self

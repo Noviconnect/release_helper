@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from typing import TYPE_CHECKING
 
@@ -14,6 +15,9 @@ import slack_sdk.web
 from slack_sdk import WebClient
 
 
+logger = logging.getLogger(__name__)
+
+
 class MessagingSlack:
     def __init__(self):
         self.client = self.get_client()
@@ -23,6 +27,8 @@ class MessagingSlack:
         return WebClient(token=os.environ["HELPER_SLACK_BOT_TOKEN"])
 
     def send_blocks(self, blocks: list[dict]) -> None:
+        logger.info(f"Sending Slack message with #{len(blocks)} blocks")
+
         self.client.chat_postMessage(
             channel=os.environ.get("HELPER_SLACK_CHANNEL_NAME"),
             blocks=blocks,
