@@ -27,7 +27,7 @@ class MessagingSlack:
         return WebClient(token=os.environ["HELPER_SLACK_BOT_TOKEN"])
 
     def send_blocks(self, blocks: list[dict]) -> None:
-        logger.info(f"Sending Slack message with #{len(blocks)} blocks")
+        logger.info("Sending Slack message with #%d blocks", len(blocks))
 
         self.client.chat_postMessage(
             channel=os.environ.get("HELPER_SLACK_CHANNEL_NAME"),
