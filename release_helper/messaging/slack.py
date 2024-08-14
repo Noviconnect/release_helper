@@ -40,6 +40,10 @@ class MessagingSlack:
         issue_state = issue.state.name
         issue_url = issue.url
         issue_assignee = issue.assignee
+
+        if issue_assignee is None:
+            logger.error("Issue %s has no assignee", issue_id)
+
         issue_assignee_email = issue_assignee.email
 
         user_notification = ""
