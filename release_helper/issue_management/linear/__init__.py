@@ -27,7 +27,9 @@ class IssueManagementLinear:
             "Authorization": f"{token}",
         }
         linear_client = Client(
-            url="https://api.linear.app/graphql", headers=headers, http_client=httpx.Client(headers=headers, timeout=httpx.Timeout(30))
+            url="https://api.linear.app/graphql",
+            headers=headers,
+            http_client=httpx.Client(headers=headers, timeout=httpx.Timeout(30)),
         )
         return linear_client
 
