@@ -61,6 +61,10 @@ function build() {
   docker compose build
 }
 
+function run() {
+  docker compose up
+}
+
 function install() {
   poetry install --with development
 }

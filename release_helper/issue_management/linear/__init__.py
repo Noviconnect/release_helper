@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 
+import httpx
+
 from release_helper.exceptions import IssueError, ReleaseHelperError
 from release_helper.issue_management.linear.graphql_client import (
     Client,
@@ -24,7 +26,11 @@ class IssueManagementLinear:
             "Content-Type": "application/json",
             "Authorization": f"{token}",
         }
-        linear_client = Client(url="https://api.linear.app/graphql", headers=headers)
+        linear_client = Client(
+            url="https://api.linear.app/graphql",
+            headers=headers,
+            http_client=httpx.Client(headers=headers, timeout=httpx.Timeout(30)),
+        )
         return linear_client
 
     def get_issues(
