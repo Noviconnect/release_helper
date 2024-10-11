@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 import httpx
 
 from release_helper.exceptions import IssueError, ReleaseHelperError
@@ -11,17 +9,16 @@ from release_helper.issue_management.linear.graphql_client import (
     IssueIssue,
     IssueUpdateInput,
     StringComparator,
+    TeamFilter,
     WorkflowStateFilter,
 )
 
 
 class IssueManagementLinear:
-    def __init__(self):
-        self.client = self.get_client()
+    def __init__(self, token: str):
+        self.client = self.get_client(token)
 
-    @staticmethod
-    def get_client() -> Client:
-        token = os.environ.get("HELPER_LINEAR_TOKEN")
+    def get_client(self, token: str) -> Client:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"{token}",
@@ -34,7 +31,7 @@ class IssueManagementLinear:
         return linear_client
 
     def get_issues(
-        self, linear_issues: list
+        self, linear_issues: list[str]
     ) -> tuple[list[IssueIssue], list[ReleaseHelperError]]:
         results: list[IssueIssue] = []
         errors: list[ReleaseHelperError] = []
@@ -52,7 +49,10 @@ class IssueManagementLinear:
         try:
             result = self.client.issue(linear_issue_id)
         except GraphQLClientGraphQLMultiError as e:
-            raise IssueError(e) from e
+            message = f"Error retrieving issue {linear_issue_id}"
+            raise IssueError(
+                message=message, issue_id=linear_issue_id, linear_exception=e
+            ) from e
         else:
             return result.issue
 
@@ -61,7 +61,10 @@ class IssueManagementLinear:
 
         for issue in issues:
             if issue.state.name == "Ready to Deploy":
-                states = WorkflowStateFilter(name=StringComparator(eq="Deployed"))
+                team_filter = TeamFilter(key=StringComparator(eq=issue.team.key))
+                states = WorkflowStateFilter(
+                    name=StringComparator(eq="Deployed"), team=team_filter
+                )
                 deployed_state = self.client.state(filter=states)
                 update = IssueUpdateInput(
                     state_id=deployed_state.workflow_states.nodes[0].id

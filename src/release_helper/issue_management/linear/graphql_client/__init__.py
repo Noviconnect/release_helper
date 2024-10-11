@@ -6,6 +6,7 @@ from .client import Client
 from .enums import (
     AuthenticationSessionType,
     ContextViewType,
+    CustomerStatusType,
     DateResolutionType,
     Day,
     FacetPageSource,
@@ -80,6 +81,8 @@ from .input_types import (
     CustomerNeedCreateInput,
     CustomerNeedFilter,
     CustomerNeedUpdateInput,
+    CustomerStatusCreateInput,
+    CustomerStatusUpdateInput,
     CustomerUpdateInput,
     CustomViewCreateInput,
     CustomViewUpdateInput,
@@ -117,6 +120,7 @@ from .input_types import (
     GitHubImportSettingsInput,
     GitHubPersonalSettingsInput,
     GitHubRepoInput,
+    GitHubRepoMappingInput,
     GitHubSettingsInput,
     GitLabSettingsInput,
     GoogleSheetsSettingsInput,
@@ -247,7 +251,6 @@ from .input_types import (
     TeamFilter,
     TeamMembershipCreateInput,
     TeamMembershipUpdateInput,
-    TeamRepoMappingInput,
     TeamSort,
     TeamUpdateInput,
     TemplateCreateInput,
@@ -277,7 +280,13 @@ from .input_types import (
     WorkflowStateUpdateInput,
     ZendeskSettingsInput,
 )
-from .issue import Issue, IssueIssue, IssueIssueAssignee, IssueIssueState
+from .issue import (
+    Issue,
+    IssueIssue,
+    IssueIssueAssignee,
+    IssueIssueState,
+    IssueIssueTeam,
+)
 from .issue_update import IssueUpdate, IssueUpdateIssueUpdate
 from .state import State, StateWorkflowStates, StateWorkflowStatesNodes
 
@@ -317,6 +326,9 @@ __all__ = [
     "CustomerNeedCreateInput",
     "CustomerNeedFilter",
     "CustomerNeedUpdateInput",
+    "CustomerStatusCreateInput",
+    "CustomerStatusType",
+    "CustomerStatusUpdateInput",
     "CustomerUpdateInput",
     "CycleCreateInput",
     "CycleFilter",
@@ -357,6 +369,7 @@ __all__ = [
     "GitHubImportSettingsInput",
     "GitHubPersonalSettingsInput",
     "GitHubRepoInput",
+    "GitHubRepoMappingInput",
     "GitHubSettingsInput",
     "GitLabSettingsInput",
     "GithubOrgType",
@@ -392,6 +405,7 @@ __all__ = [
     "IssueIssue",
     "IssueIssueAssignee",
     "IssueIssueState",
+    "IssueIssueTeam",
     "IssueLabelCollectionFilter",
     "IssueLabelCreateInput",
     "IssueLabelFilter",
@@ -523,7 +537,6 @@ __all__ = [
     "TeamFilter",
     "TeamMembershipCreateInput",
     "TeamMembershipUpdateInput",
-    "TeamRepoMappingInput",
     "TeamSort",
     "TeamUpdateInput",
     "TemplateCreateInput",

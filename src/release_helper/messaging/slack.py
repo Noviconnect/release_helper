@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-import logging
-import os
 from typing import TYPE_CHECKING
+
+import slack_sdk.web
+from loguru import logger
+from slack_sdk import WebClient
 
 
 if TYPE_CHECKING:
@@ -11,28 +13,19 @@ if TYPE_CHECKING:
     from release_helper.exceptions import ReleaseHelperError
     from release_helper.issue_management.linear import graphql_client
 
-import slack_sdk.web
-from slack_sdk import WebClient
-
-
-logger = logging.getLogger(__name__)
-
 
 class MessagingSlack:
-    def __init__(self):
-        self.client = self.get_client()
+    def __init__(self, token: str):
+        self.client = self.get_client(token)
 
     @staticmethod
-    def get_client() -> WebClient:
-        return WebClient(token=os.environ["HELPER_SLACK_BOT_TOKEN"])
+    def get_client(token: str) -> WebClient:
+        return WebClient(token=token)
 
-    def send_blocks(self, blocks: list[dict]) -> None:
-        logger.info("Sending Slack message with #%d blocks", len(blocks))
+    def send_blocks(self, *, channel: str, blocks: list[dict], text: str) -> None:
+        logger.info("Sending Slack message with {} blocks", len(blocks))
 
-        self.client.chat_postMessage(
-            channel=os.environ.get("HELPER_SLACK_CHANNEL_NAME"),
-            blocks=blocks,
-        )
+        self.client.chat_postMessage(channel=channel, blocks=blocks, text=text)
 
     def generate_user_message(self, issue: graphql_client.IssueIssue) -> dict[str, str]:
         issue_id = issue.identifier
@@ -42,7 +35,7 @@ class MessagingSlack:
         issue_assignee = issue.assignee
 
         if issue_assignee is None:
-            logger.error("Issue %s has no assignee", issue_id)
+            logger.error("Issue {} has no assignee", issue_id)
 
         issue_assignee_email = issue_assignee.email
 
@@ -66,18 +59,23 @@ class MessagingSlack:
         return block
 
     def send_release_message(
-        self, release_draft: GitRelease, issues: list[graphql_client.IssueIssue]
+        self,
+        *,
+        channel: str,
+        release_draft: GitRelease,
+        issues: list[graphql_client.IssueIssue],
+        repository: str,
     ) -> None:
         release_title = release_draft.title
-        repository_full = os.environ.get("GITHUB_REPOSITORY")
-        repository = os.environ.get("GITHUB_REPOSITORY").split("/")[1]
+        repository_full = repository
+        repository_short = repository_full.split("/")[1]
 
         blocks = [
             {
                 "type": "header",
                 "text": {
                     "type": "plain_text",
-                    "text": f"{repository} - Draft Release: {release_title}",
+                    "text": f"{repository_short} - Draft Release: {release_title}",
                     "emoji": True,
                 },
             },
@@ -97,9 +95,13 @@ class MessagingSlack:
             block = self.generate_user_message(issue)
             blocks.append(block)
 
-        self.send_blocks(blocks)
+        self.send_blocks(
+            channel=channel,
+            blocks=blocks,
+            text=f"Release {release_title} for {repository_short}",
+        )
 
-    def send_deploy_message(self, release_title: str) -> None:
+    def send_deploy_message(self, *, channel: str, release_title: str) -> None:
         blocks = [
             {
                 "type": "section",
@@ -110,9 +112,11 @@ class MessagingSlack:
             }
         ]
 
-        self.send_blocks(blocks)
+        self.send_blocks(
+            channel=channel, blocks=blocks, text=f"Deploying {release_title}"
+        )
 
-    def send_not_deploy_message(self, release_title: str) -> None:
+    def send_not_deploy_message(self, *, channel: str, release_title: str) -> None:
         blocks = [
             {
                 "type": "section",
@@ -123,9 +127,11 @@ class MessagingSlack:
             }
         ]
 
-        self.send_blocks(blocks)
+        self.send_blocks(
+            channel=channel, blocks=blocks, text=f"Not deploying {release_title}"
+        )
 
-    def send_errors(self, errors: list[ReleaseHelperError]) -> None:
+    def send_errors(self, *, channel: str, errors: list[ReleaseHelperError]) -> None:
         blocks = [
             {
                 "type": "header",
@@ -149,4 +155,6 @@ class MessagingSlack:
                 }
             )
 
-        self.send_blocks(blocks)
+        self.send_blocks(
+            channel=channel, blocks=blocks, text="Error Processing Release"
+        )

@@ -2,17 +2,21 @@
 name = "release_helper"
 version = "1.1.1"
 description = "A tool to check related tickets are in a ready state for deployment."
-authors = ["jason davila <jason@noviconnect.com>"]
+authors = ["Jason Davila <jason@noviconnect.com>", "Christian Jensen <christian@noviconnect.com>"]
 license = "MIT"
 readme = "README.md"
+package-mode = false
+packages = [{ include = "release_helper", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
 PyGithub = "^2.3.0"
 requests = "^2.32.3"
-slack-sdk = "^3.28.0"
-pydantic = "^2.7.4"
+slack-sdk = "^3.31.0"
+pydantic = "^2.8.2"
 httpx = "^0.27.0"
+pydantic-settings = "^2.4.0"
+loguru = "^0.7.2"
 
 
 [tool.poetry.group.development.dependencies]

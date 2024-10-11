@@ -18,19 +18,22 @@ query Issue($issueId: String!) {
         }
         url
         identifier
+        team {
+            key
+        }
     }
 }
 
 query State($filter: WorkflowStateFilter) {
-  workflowStates(filter: $filter) {
-    nodes {
-      id
+    workflowStates(filter: $filter) {
+        nodes {
+            id
+        }
     }
-  }
 }
 
 mutation IssueUpdate($input: IssueUpdateInput!, $issueId: String!) {
-  issueUpdate(id: $issueId, input: $input) {
-    success
-  }
+    issueUpdate(id: $issueId, input: $input) {
+        success
+    }
 }
