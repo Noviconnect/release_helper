@@ -23,6 +23,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   env:
+    ACTIONS_RUNNER_PRINT_LOG_TO_STDOUT: 'true'
     HELPER_GITHUB_TOKEN: ${{ inputs.github-token }}
     HELPER_LINEAR_TOKEN: ${{ inputs.linear-token }}
     HELPER_SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
