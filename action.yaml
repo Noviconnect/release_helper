@@ -22,7 +22,7 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: noviconnect/release_helper
-        ref: v4
+        ref: v4.1
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -30,11 +30,12 @@ runs:
         python-version: '3.12'
 
     - name: Install Poetry
-      uses: snok/install-poetry@v1
+      uses: abatilo/actions-poetry@v3
 
     - name: Run release_helper module
       shell: bash
       run: |
+        # running release_helper
         poetry install -q
         poetry run python src/release_helper/main.py
       env:
