@@ -38,39 +38,19 @@ function _finish() {
 # Trap EXIT signal and call the _finish function
 trap _finish EXIT
 
-COMPOSE_PROJECT_NAME=release_helper
-export COMPOSE_PROJECT_NAME
-
-COMPOSE_INTERACTIVE_NO_CLI=1
-export COMPOSE_INTERACTIVE_NO_CLI
-
-COMPOSE_DOCKER_CLI_BUILD=1
-export COMPOSE_DOCKER_CLI_BUILD
-
-DOCKER_BUILDKIT=1
-export DOCKER_BUILDKIT
-
-BUILDKIT_PROGRESS=plain
-export BUILDKIT_PROGRESS
-
-function clean() {
-  rm -Rf .cache
-}
-
-function build() {
-  docker compose build
-}
-
-function run() {
-  docker compose up
-}
-
-function install() {
-  poetry install --with development
+function update-graphql-schema() {
+  local url="https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+  local OUTPUT_FILE="src/release_helper/issue_management/linear/schema.graphql"
+  curl -L "$url" -o "$OUTPUT_FILE"
 }
 
 function generate-linear-client() {
-  docker compose run --rm --build codegen ariadne-codegen --config release_helper/issue_management/linear/graphql_generator.toml client
+  ariadne-codegen --config src/release_helper/issue_management/linear/graphql_generator.toml client
+}
+
+function run() {
+  cd src
+  python -m release_helper.main
 }
 
 function help() {

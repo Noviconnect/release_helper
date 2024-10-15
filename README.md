@@ -1,69 +1,46 @@
-# release_helper docker action
+# Release Helper Action
 
-A tool to check related tickets are in a ready state for deployment.
+This repository contains a GitHub Action that runs a Python script called `release_helper`.
+
+This GitHub Action is designed to automate the validation process of issues linked to a GitHub release. It ensures that all Linear tickets mentioned in the release notes are in a "completed" status before the release is marked as non-draft. If any tickets are not in a completed state, the action sends a Slack notification to the responsible users, prompting them to take action.
+
+## Usage
+
+To use this action in your repository:
+
+```yaml
+jobs:
+  run-release-helper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Release Helper
+        uses: noviconnect/release-helper-action@v1
+        with:
+          github-token: "some-value"
+          linear-token: "some-value"
+          slack-bot-token: "some-value"
+          slack-channel-name: "some-value"
+
+```
 
 ## Inputs
 
-### `github-token`
-
-**Required** release_helper github token.
-
-### `linear-token`
-
-**Required** release_helper linear token.
-
-### `slack-bot-token`
-
-**Required** release_helper slack bot token.
-
-### `slack-channel-name`
-
-**Required** release_helper slack channel name, include the #.
+- **`arg1`**: The first argument passed to the `release_helper.py` script.
 
 ## Outputs
 
-## Example usage
+This action does not produce any outputs.
 
-```yaml
-- name: release_helper
-  uses: Noviconnect/release_helper@v1
-  env:
-      HELPER_GITHUB_TOKEN: '${{ github.token }}'
-      HELPER_LINEAR_TOKEN: '${{ secrets.HELPER_LINEAR_TOKEN }}'
-      HELPER_SLACK_BOT_TOKEN: '${{ secrets.SLACK_BOT_TOKEN }}'
-      HELPER_SLACK_CHANNEL_NAME: '#production-deploys'
-```
+## License
 
-## Development Guide
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-This section provides a comprehensive guide on how to set up and develop the release_helper project.
+# Development
 
-### Prerequisites
-
-- Docker
-- Docker Compose
-- Poetry (for local development without Docker)
-
-### Getting Started
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/Noviconnect/release_helper.git
-   cd release_helper
-   ```
-
-2. Set up environment variables:
-   This is WIP as a practice hasn't been introduced to this repository just yet.
-
-### Building the Project
-
-To build the Docker image for the project, run:
-
-```
-./taskfile.sh build
-```
-
-This command uses Docker Compose to build the image defined in the `Dockerfile`. It will install all the necessary dependencies and set up the environment for the release_helper.
+1. Install Poetry: https://python-poetry.org/docs/#installation
+2. Install dependencies: `poetry install`
+3. Activate the virtual environment: `poetry shell`
 
 ### Running the Project
 
@@ -83,14 +60,25 @@ The `taskfile.sh` script provides several other useful commands for development:
 - `./taskfile.sh install`: Installs project dependencies using Poetry (for local development).
 - `./taskfile.sh generate-linear-client`: Generates the Linear API client using ariadne-codegen.
 
-### Local Development
+## Detailed Description
 
-If you prefer to develop without Docker:
+### Overview
 
-1. Install Poetry: https://python-poetry.org/docs/#installation
-2. Install dependencies: `poetry install`
-3. Activate the virtual environment: `poetry shell`
-4. Run the script: `python main.py`
+This GitHub Action operates as a composite action written in Python. It follows a sequence of steps to validate the status of Linear issues associated with a GitHub release. The action uses the following workflow:
+
+1. **Set Up Python Environment**: The action begins by setting up a Python environment suitable for executing the script.
+
+2. **Fetch the Latest GitHub Release**: The script retrieves the most recent GitHub release and extracts the release notes. These notes were originally drafted by a separate GitHub Action called "release drafter."
+
+3. **Scan for Linear Ticket References**: The release notes are scanned for references to Linear tickets using a regular expression pattern. The pattern matches tickets in the form of a few letters, a dash, and a few numerical digits (e.g., `ABC-123`).
+
+4. **Query Linear API for Issue Status**: For each identified Linear ticket, the script queries the Linear GraphQL API to retrieve the issue's status and associated team.
+
+5. **Check for Completed Status**: Linear tickets have various status types, such as "completed," "in-progress," etc. The script verifies if all identified issues are in a "completed" status type. Examples of completed statuses include "Deployed," "Ready to Deploy," and "Done."
+
+6. **Determine Next Steps**:
+   - If **all issues** are in a completed state, the script marks the GitHub release as non-draft. This triggers another GitHub Action to deploy the release to production.
+   - If **any issue** is not in a completed state, the script compiles a list of these issues and sends a notification to a Slack channel. The Slack message includes the issue details and mentions the responsible users. The users are identified by querying the Slack API using the email address associated with the Linear issue.
 
 ### Updating the Linear API Client
 

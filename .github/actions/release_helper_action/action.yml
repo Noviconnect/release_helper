@@ -1,0 +1,43 @@
+name: 'Release Helper Action'
+description: 'A tool to check related tickets are in a ready state for deployment.'
+inputs:
+  github-token:
+    description: 'release_helper github token'
+    required: true
+  linear-token:
+    description: 'release_helper linear token'
+    required: true
+  slack-bot-token:
+    description: 'release_helper slack bot token'
+    required: true
+  slack-channel-name:
+    description: 'release_helper slack channel name, do not include the #'
+    required: true
+runs:
+  using: "composite"
+  steps:
+
+    - uses: actions/checkout@v4
+
+    - name: Install poetry
+      shell: bash
+      run: pipx install poetry
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        cache: 'poetry'
+
+    - name: Install Poetry
+      shell: bash
+      run: poetry install
+
+    - name: Run Release Helper
+      shell: bash
+      env:
+        HELPER_GITHUB_TOKEN: ${{ inputs.github-token }}
+        HELPER_LINEAR_TOKEN: ${{ inputs.linear-token }}
+        HELPER_SLACK_BOT_TOKEN: ${{ inputs.slack-bot-token }}
+        HELPER_SLACK_CHANNEL_NAME: ${{ inputs.slack-channel-name }}
+      run: |
+        python ${{ github.action_path }}/release_helper.py

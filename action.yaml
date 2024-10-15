@@ -1,0 +1,49 @@
+name: 'release_helper'
+description: 'A tool to check related tickets are in a ready state for deployment.'
+
+inputs:
+  github-token:
+    description: 'release_helper GitHub token'
+    required: true
+  linear-token:
+    description: 'release_helper Linear token'
+    required: true
+  slack-bot-token:
+    description: 'release_helper Slack bot token'
+    required: true
+  slack-channel-name:
+    description: 'release_helper Slack channel name, include the #'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout Code Repository
+      uses: actions/checkout@v4
+      with:
+        repository: noviconnect/release_helper
+        ref: v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+
+    - name: Run release_helper module
+      shell: bash
+      run: |
+        poetry install -q
+        poetry run python src/release_helper/main.py
+      env:
+        PYTHONPATH: src
+        HELPER__GITHUB_TOKEN: ${{ inputs.github-token }}
+        HELPER__LINEAR__TOKEN: ${{ inputs.linear-token }}
+        HELPER__SLACK__BOT_TOKEN: ${{ inputs.slack-bot-token }}
+        HELPER__SLACK__DEPLOY_CHANNEL: ${{ inputs.slack-channel-name }}
+
+branding:
+  color: 'blue'
+  icon: 'play-circle'
