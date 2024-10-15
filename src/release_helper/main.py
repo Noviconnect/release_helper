@@ -65,7 +65,9 @@ def process_potential_release() -> None:
     for issue in issues:
         if issue.state.type != "completed":
             block = slack.generate_user_message(issue)
-            channel = settings.helper.slack.channels[issue.team.key.casefold()]
+            channel = settings.helper.slack.channels.get(
+                issue.team.key.casefold(), settings.helper.slack.deploy_channel
+            )
             slack.send_blocks(channel=channel, blocks=[block], text="")
 
         logger.info("Ticket Status messages sent.")
