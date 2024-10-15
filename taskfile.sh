@@ -50,7 +50,7 @@ function generate-linear-client() {
 
 function run() {
   cd src
-  python -m release_helper.main
+  poetry run python -m release_helper.main
 }
 
 function help() {
