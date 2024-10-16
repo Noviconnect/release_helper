@@ -64,6 +64,7 @@ ignore = [# https://docs.astral.sh/ruff/settings/#lint_ignore
     "D106", # Missing docstring in public nested class
     "D107", # Missing docstring in __init__
     "RET504", # Missing return type annotation
+    "PLR0913",
 ]
 
 [lint.per-file-ignores]

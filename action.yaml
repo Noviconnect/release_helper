@@ -44,6 +44,7 @@ runs:
         HELPER__LINEAR__TOKEN: ${{ inputs.linear-token }}
         HELPER__SLACK__BOT_TOKEN: ${{ inputs.slack-bot-token }}
         HELPER__SLACK__DEPLOY_CHANNEL: ${{ inputs.slack-channel-name }}
+        HELPER__DEPLOY: ${{ inputs.enable-deploy }}
 
 branding:
   color: 'blue'
