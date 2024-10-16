@@ -14,6 +14,9 @@ inputs:
   slack-channel-name:
     description: 'release_helper Slack channel name, include the #'
     required: true
+  enable-deploy:
+    description: 'release_helper allow deployment'
+    required: false
 
 runs:
   using: 'composite'
