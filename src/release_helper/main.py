@@ -27,24 +27,34 @@ def process_potential_release() -> None:
     try:
         release_draft: GitRelease = github.get_draft_release()
     except ReleaseHelperError as e:
-        handle_no_draft_release(slack, settings, e)
+        handle_no_draft_release(errors=e, settings=settings, slack=slack)
         return
 
     issue_names = github.get_issues_from_release(release_draft)
     issues, errors = linear.get_issues(issue_names)
 
     if settings.helper.deploy:
-        handle_deploy(settings, slack, github, linear, release_draft, issues, errors)
+        handle_deploy(
+            errors=errors,
+            github=github,
+            issues=issues,
+            linear=linear,
+            release_draft=release_draft,
+            settings=settings,
+            slack=slack,
+        )
     else:
-        handle_non_deploy(settings, slack, issues, release_draft)
+        handle_non_deploy(
+            issues=issues, release_draft=release_draft, settings=settings, slack=slack
+        )
 
 
 def handle_no_draft_release(
-    error: ReleaseHelperError,
+    errors: ReleaseHelperError,
     settings: Settings,
     slack: MessagingSlack,
 ) -> None:
-    slack.send_errors(channel=settings.helper.slack.deploy_channel, errors=[error])
+    slack.send_errors(channel=settings.helper.slack.deploy_channel, errors=[errors])
     logger.info("No draft release found. Exiting.")
 
 
