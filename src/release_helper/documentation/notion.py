@@ -133,9 +133,7 @@ class DocumentationNotion:
             toggle_children = []
 
             # Add team info
-            team_name = (
-                issue.team.name if hasattr(issue.team, "name") else issue.team.key
-            )
+            team_name = getattr(issue.team, "name", None) or issue.team.key
             toggle_children.append(
                 {
                     "object": "block",
