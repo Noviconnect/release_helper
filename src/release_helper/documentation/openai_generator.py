@@ -196,8 +196,11 @@ class OpenAIGenerator:
             if issue["description"]:
                 # Truncate description if it's too long
                 description = issue["description"]
-                if len(description) > 200:  # noqa: PLR2004
-                    description = description[:197] + "..."
+                DESCRIPTION_MAX_LENGTH = 200
+                TRUNCATION_SUFFIX = "..."
+
+                if len(description) > DESCRIPTION_MAX_LENGTH:
+                    description = description[:DESCRIPTION_MAX_LENGTH - len(TRUNCATION_SUFFIX)] + TRUNCATION_SUFFIX
                 issue_text += f"\n  Description: {description}"
 
             # Add URL
