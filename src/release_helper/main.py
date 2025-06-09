@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 from loguru import logger
 
+from release_helper.documentation.notion import DocumentationNotion
+from release_helper.documentation.openai_generator import OpenAIGenerator
 from release_helper.exceptions import ReleaseHelperError
 from release_helper.issue_management.linear import IssueManagementLinear
 from release_helper.messaging.slack import MessagingSlack
@@ -75,11 +77,37 @@ def handle_deploy(
     if all(issue.state.type == "completed" for issue in issues):
         github.deploy(release_draft)
         linear.set_issues_to_deployed(issues)
+
+        openai_generator = OpenAIGenerator(
+            api_key=settings.helper.openai.api_key, model=settings.helper.openai.model
+        )
+        ai_content = openai_generator.generate_release_notes(
+            release_title=release_draft.title,
+            release_body=release_draft.body,
+            issues=issues,
+        )
+        logger.info("Successfully generated AI release notes")
+
+        notion = DocumentationNotion(
+            token=settings.helper.notion.token,
+            parent_page_id=settings.helper.notion.parent_page_id,
+        )
+        notion_url = notion.create_release_notes_page(
+            release_title=release_draft.title,
+            release_body=release_draft.body,
+            release_url=f"https://github.com/{settings.github_repository}/releases/tag/{release_draft.tag_name}",
+            issues=issues,
+            ai_generated_content=ai_content,
+        )
+        logger.info(f"Created Notion page for release notes: {notion_url}")
+
         slack.send_deploy_message(
             channel=settings.helper.slack.deploy_channel,
             release_title=release_draft.title,
+            notion_url=notion_url,
         )
-        logger.info("Release deployed.")
+
+        logger.info(f"Release deployed and documented in Notion: {notion_url}")
     else:
         slack.send_release_message(
             channel=settings.helper.slack.deploy_channel,

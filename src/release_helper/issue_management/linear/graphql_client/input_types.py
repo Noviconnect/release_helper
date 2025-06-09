@@ -8,18 +8,24 @@ from pydantic import Field
 from .base_model import BaseModel
 from .enums import (
     ContextViewType,
-    CustomerStatusType,
+    CyclePeriod,
     DateResolutionType,
     Day,
+    FeedSummarySchedule,
+    FrequencyResolutionType,
     GitAutomationStates,
     GithubOrgType,
     InitiativeStatus,
     InitiativeTab,
+    InitiativeUpdateHealthType,
     IssueRelationType,
     PaginationNulls,
     PaginationSortOrder,
+    ProductIntelligenceScope,
+    ProjectStatusType,
     ProjectTab,
     ProjectUpdateHealthType,
+    PullRequestReviewTool,
     PushSubscriptionType,
     SlackChannelType,
     SLADayCountType,
@@ -39,6 +45,19 @@ class ApiKeyCreateInput(BaseModel):
     id: Optional[str] = None
     key: str
     label: str
+    scope: Optional[List[str]] = None
+    team_ids: Optional[List[str]] = Field(alias="teamIds", default=None)
+
+
+class ApiKeyUpdateInput(BaseModel):
+    label: Optional[str] = None
+    scope: Optional[List[str]] = None
+    team_ids: Optional[List[str]] = Field(alias="teamIds", default=None)
+
+
+class ApproximateNeedCountSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class AssigneeSort(BaseModel):
@@ -104,25 +123,16 @@ class AttachmentUpdateInput(BaseModel):
 
 class AuditEntryFilter(BaseModel):
     actor: Optional["NullableUserFilter"] = None
+    and_: Optional[List["AuditEntryFilter"]] = Field(alias="and", default=None)
     country_code: Optional["StringComparator"] = Field(
         alias="countryCode", default=None
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     id: Optional["IDComparator"] = None
     ip: Optional["StringComparator"] = None
+    or_: Optional[List["AuditEntryFilter"]] = Field(alias="or", default=None)
     type: Optional["StringComparator"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
-
-
-class AuthApiKeyCreateInput(BaseModel):
-    id: Optional[str] = None
-    key: str
-    label: str
-
-
-class AuthOrganizationUpdateInput(BaseModel):
-    invite_hash: Optional[str] = Field(alias="inviteHash", default=None)
-    url_key: Optional[str] = Field(alias="urlKey", default=None)
 
 
 class BooleanComparator(BaseModel):
@@ -134,7 +144,7 @@ class CommentCollectionFilter(BaseModel):
     and_: Optional[List["CommentCollectionFilter"]] = Field(alias="and", default=None)
     body: Optional["StringComparator"] = None
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    document_content: Optional["DocumentContentFilter"] = Field(
+    document_content: Optional["NullableDocumentContentFilter"] = Field(
         alias="documentContent", default=None
     )
     every: Optional["CommentFilter"] = None
@@ -144,7 +154,7 @@ class CommentCollectionFilter(BaseModel):
     needs: Optional["CustomerNeedCollectionFilter"] = None
     or_: Optional[List["CommentCollectionFilter"]] = Field(alias="or", default=None)
     parent: Optional["NullableCommentFilter"] = None
-    project_update: Optional["ProjectUpdateFilter"] = Field(
+    project_update: Optional["NullableProjectUpdateFilter"] = Field(
         alias="projectUpdate", default=None
     )
     reactions: Optional["ReactionCollectionFilter"] = None
@@ -167,8 +177,12 @@ class CommentCreateInput(BaseModel):
     )
     document_content_id: Optional[str] = Field(alias="documentContentId", default=None)
     id: Optional[str] = None
+    initiative_update_id: Optional[str] = Field(
+        alias="initiativeUpdateId", default=None
+    )
     issue_id: Optional[str] = Field(alias="issueId", default=None)
     parent_id: Optional[str] = Field(alias="parentId", default=None)
+    post_id: Optional[str] = Field(alias="postId", default=None)
     project_update_id: Optional[str] = Field(alias="projectUpdateId", default=None)
     quoted_text: Optional[str] = Field(alias="quotedText", default=None)
     subscriber_ids: Optional[List[str]] = Field(alias="subscriberIds", default=None)
@@ -178,7 +192,7 @@ class CommentFilter(BaseModel):
     and_: Optional[List["CommentFilter"]] = Field(alias="and", default=None)
     body: Optional["StringComparator"] = None
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    document_content: Optional["DocumentContentFilter"] = Field(
+    document_content: Optional["NullableDocumentContentFilter"] = Field(
         alias="documentContent", default=None
     )
     id: Optional["IDComparator"] = None
@@ -186,7 +200,7 @@ class CommentFilter(BaseModel):
     needs: Optional["CustomerNeedCollectionFilter"] = None
     or_: Optional[List["CommentFilter"]] = Field(alias="or", default=None)
     parent: Optional["NullableCommentFilter"] = None
-    project_update: Optional["ProjectUpdateFilter"] = Field(
+    project_update: Optional["NullableProjectUpdateFilter"] = Field(
         alias="projectUpdate", default=None
     )
     reactions: Optional["ReactionCollectionFilter"] = None
@@ -253,8 +267,10 @@ class CreatedAtSort(BaseModel):
 class CustomViewCreateInput(BaseModel):
     color: Optional[str] = None
     description: Optional[str] = None
+    feed_item_filter_data: Optional["FeedItemFilter"] = Field(
+        alias="feedItemFilterData", default=None
+    )
     filter_data: Optional["IssueFilter"] = Field(alias="filterData", default=None)
-    filters: Optional[Any] = None
     icon: Optional[str] = None
     id: Optional[str] = None
     initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
@@ -271,8 +287,10 @@ class CustomViewCreateInput(BaseModel):
 class CustomViewUpdateInput(BaseModel):
     color: Optional[str] = None
     description: Optional[str] = None
+    feed_item_filter_data: Optional["FeedItemFilter"] = Field(
+        alias="feedItemFilterData", default=None
+    )
     filter_data: Optional["IssueFilter"] = Field(alias="filterData", default=None)
-    filters: Optional[Any] = None
     icon: Optional[str] = None
     initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
     name: Optional[str] = None
@@ -285,25 +303,9 @@ class CustomViewUpdateInput(BaseModel):
     team_id: Optional[str] = Field(alias="teamId", default=None)
 
 
-class CustomerCollectionFilter(BaseModel):
-    and_: Optional[List["CustomerCollectionFilter"]] = Field(alias="and", default=None)
-    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    domains: Optional["StringArrayComparator"] = None
-    every: Optional["CustomerFilter"] = None
-    external_ids: Optional["StringArrayComparator"] = Field(
-        alias="externalIds", default=None
-    )
-    id: Optional["IDComparator"] = None
-    length: Optional["NumberComparator"] = None
-    name: Optional["StringComparator"] = None
-    needs: Optional["CustomerNeedCollectionFilter"] = None
-    or_: Optional[List["CustomerCollectionFilter"]] = Field(alias="or", default=None)
-    owner: Optional["UserFilter"] = None
-    slack_channel_id: Optional["StringComparator"] = Field(
-        alias="slackChannelId", default=None
-    )
-    some: Optional["CustomerFilter"] = None
-    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+class CustomerCountSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class CustomerCreateInput(BaseModel):
@@ -312,10 +314,20 @@ class CustomerCreateInput(BaseModel):
         alias="externalIds", default_factory=lambda: []
     )
     id: Optional[str] = None
+    logo_url: Optional[str] = Field(alias="logoUrl", default=None)
+    main_source_id: Optional[str] = Field(alias="mainSourceId", default=None)
     name: str
     owner_id: Optional[str] = Field(alias="ownerId", default=None)
+    revenue: Optional[int] = None
+    size: Optional[int] = None
     slack_channel_id: Optional[str] = Field(alias="slackChannelId", default=None)
     status_id: Optional[str] = Field(alias="statusId", default=None)
+    tier_id: Optional[str] = Field(alias="tierId", default=None)
+
+
+class CustomerCreatedAtSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class CustomerFilter(BaseModel):
@@ -329,11 +341,20 @@ class CustomerFilter(BaseModel):
     name: Optional["StringComparator"] = None
     needs: Optional["CustomerNeedCollectionFilter"] = None
     or_: Optional[List["CustomerFilter"]] = Field(alias="or", default=None)
-    owner: Optional["UserFilter"] = None
+    owner: Optional["NullableUserFilter"] = None
+    revenue: Optional["NumberComparator"] = None
+    size: Optional["NumberComparator"] = None
     slack_channel_id: Optional["StringComparator"] = Field(
         alias="slackChannelId", default=None
     )
+    status: Optional["CustomerStatusFilter"] = None
+    tier: Optional["CustomerTierFilter"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+
+
+class CustomerImportantCountSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class CustomerNeedCollectionFilter(BaseModel):
@@ -342,7 +363,7 @@ class CustomerNeedCollectionFilter(BaseModel):
     )
     comment: Optional["NullableCommentFilter"] = None
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    customer: Optional["CustomerFilter"] = None
+    customer: Optional["NullableCustomerFilter"] = None
     every: Optional["CustomerNeedFilter"] = None
     id: Optional["IDComparator"] = None
     issue: Optional["NullableIssueFilter"] = None
@@ -356,9 +377,22 @@ class CustomerNeedCollectionFilter(BaseModel):
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
+class CustomerNeedCreateFromAttachmentInput(BaseModel):
+    attachment_id: str = Field(alias="attachmentId")
+
+
 class CustomerNeedCreateInput(BaseModel):
+    attachment_id: Optional[str] = Field(alias="attachmentId", default=None)
+    attachment_url: Optional[str] = Field(alias="attachmentUrl", default=None)
+    body: Optional[str] = None
+    body_data: Optional[Any] = Field(alias="bodyData", default=None)
     comment_id: Optional[str] = Field(alias="commentId", default=None)
-    customer_id: str = Field(alias="customerId")
+    create_as_user: Optional[str] = Field(alias="createAsUser", default=None)
+    customer_external_id: Optional[str] = Field(
+        alias="customerExternalId", default=None
+    )
+    customer_id: Optional[str] = Field(alias="customerId", default=None)
+    display_icon_url: Optional[str] = Field(alias="displayIconUrl", default=None)
     id: Optional[str] = None
     issue_id: Optional[str] = Field(alias="issueId", default=None)
     priority: Optional[float] = None
@@ -369,7 +403,7 @@ class CustomerNeedFilter(BaseModel):
     and_: Optional[List["CustomerNeedFilter"]] = Field(alias="and", default=None)
     comment: Optional["NullableCommentFilter"] = None
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    customer: Optional["CustomerFilter"] = None
+    customer: Optional["NullableCustomerFilter"] = None
     id: Optional["IDComparator"] = None
     issue: Optional["NullableIssueFilter"] = None
     or_: Optional[List["CustomerNeedFilter"]] = Field(alias="or", default=None)
@@ -379,34 +413,138 @@ class CustomerNeedFilter(BaseModel):
 
 
 class CustomerNeedUpdateInput(BaseModel):
+    apply_priority_to_related_needs: Optional[bool] = Field(
+        alias="applyPriorityToRelatedNeeds", default=None
+    )
+    attachment_url: Optional[str] = Field(alias="attachmentUrl", default=None)
+    body: Optional[str] = None
+    body_data: Optional[Any] = Field(alias="bodyData", default=None)
+    customer_external_id: Optional[str] = Field(
+        alias="customerExternalId", default=None
+    )
+    customer_id: Optional[str] = Field(alias="customerId", default=None)
     id: Optional[str] = None
+    issue_id: Optional[str] = Field(alias="issueId", default=None)
     priority: Optional[float] = None
+    project_id: Optional[str] = Field(alias="projectId", default=None)
+
+
+class CustomerRevenueSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
+
+
+class CustomerSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
+
+
+class CustomerSortInput(BaseModel):
+    approximate_need_count: Optional["ApproximateNeedCountSort"] = Field(
+        alias="approximateNeedCount", default=None
+    )
+    created_at: Optional["CustomerCreatedAtSort"] = Field(
+        alias="createdAt", default=None
+    )
+    name: Optional["NameSort"] = None
+    owner: Optional["OwnerSort"] = None
+    revenue: Optional["RevenueSort"] = None
+    size: Optional["SizeSort"] = None
+    status: Optional["CustomerStatusSort"] = None
+    tier: Optional["TierSort"] = None
 
 
 class CustomerStatusCreateInput(BaseModel):
     color: str
     description: Optional[str] = None
+    display_name: Optional[str] = Field(alias="displayName", default=None)
     id: Optional[str] = None
-    name: str
-    position: float
-    type: CustomerStatusType
+    name: Optional[str] = None
+    position: Optional[float] = None
+
+
+class CustomerStatusFilter(BaseModel):
+    and_: Optional[List["CustomerStatusFilter"]] = Field(alias="and", default=None)
+    color: Optional["StringComparator"] = None
+    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
+    description: Optional["StringComparator"] = None
+    id: Optional["IDComparator"] = None
+    name: Optional["StringComparator"] = None
+    or_: Optional[List["CustomerStatusFilter"]] = Field(alias="or", default=None)
+    position: Optional["NumberComparator"] = None
+    type: Optional["StringComparator"] = None
+    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+
+
+class CustomerStatusSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class CustomerStatusUpdateInput(BaseModel):
     color: Optional[str] = None
     description: Optional[str] = None
+    display_name: Optional[str] = Field(alias="displayName", default=None)
     name: Optional[str] = None
     position: Optional[float] = None
-    type: Optional[CustomerStatusType] = None
+
+
+class CustomerTierCreateInput(BaseModel):
+    color: str
+    description: Optional[str] = None
+    display_name: Optional[str] = Field(alias="displayName", default=None)
+    id: Optional[str] = None
+    name: Optional[str] = None
+    position: Optional[float] = None
+
+
+class CustomerTierFilter(BaseModel):
+    and_: Optional[List["CustomerTierFilter"]] = Field(alias="and", default=None)
+    color: Optional["StringComparator"] = None
+    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
+    description: Optional["StringComparator"] = None
+    id: Optional["IDComparator"] = None
+    name: Optional["StringComparator"] = None
+    or_: Optional[List["CustomerTierFilter"]] = Field(alias="or", default=None)
+    position: Optional["NumberComparator"] = None
+    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+
+
+class CustomerTierUpdateInput(BaseModel):
+    color: Optional[str] = None
+    description: Optional[str] = None
+    display_name: Optional[str] = Field(alias="displayName", default=None)
+    name: Optional[str] = None
+    position: Optional[float] = None
 
 
 class CustomerUpdateInput(BaseModel):
     domains: Optional[List[str]] = None
     external_ids: Optional[List[str]] = Field(alias="externalIds", default=None)
+    logo_url: Optional[str] = Field(alias="logoUrl", default=None)
+    main_source_id: Optional[str] = Field(alias="mainSourceId", default=None)
     name: Optional[str] = None
     owner_id: Optional[str] = Field(alias="ownerId", default=None)
+    revenue: Optional[int] = None
+    size: Optional[int] = None
     slack_channel_id: Optional[str] = Field(alias="slackChannelId", default=None)
     status_id: Optional[str] = Field(alias="statusId", default=None)
+    tier_id: Optional[str] = Field(alias="tierId", default=None)
+
+
+class CustomerUpsertInput(BaseModel):
+    domains: Optional[List[str]] = None
+    external_id: Optional[str] = Field(alias="externalId", default=None)
+    id: Optional[str] = None
+    logo_url: Optional[str] = Field(alias="logoUrl", default=None)
+    name: Optional[str] = None
+    owner_id: Optional[str] = Field(alias="ownerId", default=None)
+    revenue: Optional[int] = None
+    size: Optional[int] = None
+    slack_channel_id: Optional[str] = Field(alias="slackChannelId", default=None)
+    status_id: Optional[str] = Field(alias="statusId", default=None)
+    tier_id: Optional[str] = Field(alias="tierId", default=None)
+    tier_name: Optional[str] = Field(alias="tierName", default=None)
 
 
 class CycleCreateInput(BaseModel):
@@ -440,6 +578,14 @@ class CycleFilter(BaseModel):
     starts_at: Optional["DateComparator"] = Field(alias="startsAt", default=None)
     team: Optional["TeamFilter"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+
+
+class CyclePeriodComparator(BaseModel):
+    eq: Optional[CyclePeriod] = None
+    in_: Optional[List[CyclePeriod]] = Field(alias="in", default=None)
+    neq: Optional[CyclePeriod] = None
+    nin: Optional[List[CyclePeriod]] = None
+    null: Optional[bool] = None
 
 
 class CycleShiftAllInput(BaseModel):
@@ -478,45 +624,9 @@ class DeleteOrganizationInput(BaseModel):
     deletion_code: str = Field(alias="deletionCode")
 
 
-class DiaryEntryCreateInput(BaseModel):
-    body_data: Optional[Any] = Field(alias="bodyData", default=None)
-    date: Any
-    id: Optional[str] = None
-
-
-class DiaryEntryUpdateInput(BaseModel):
-    body_data: Optional[Any] = Field(alias="bodyData", default=None)
-    date: Optional[Any] = None
-
-
-class DocumentCollectionFilter(BaseModel):
-    and_: Optional[List["DocumentCollectionFilter"]] = Field(alias="and", default=None)
-    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    creator: Optional["UserFilter"] = None
-    every: Optional["DocumentFilter"] = None
-    id: Optional["IDComparator"] = None
-    initiative: Optional["InitiativeFilter"] = None
-    length: Optional["NumberComparator"] = None
-    or_: Optional[List["DocumentCollectionFilter"]] = Field(alias="or", default=None)
-    project: Optional["ProjectFilter"] = None
-    slug_id: Optional["StringComparator"] = Field(alias="slugId", default=None)
-    some: Optional["DocumentFilter"] = None
-    title: Optional["StringComparator"] = None
-    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
-
-
-class DocumentContentFilter(BaseModel):
-    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    document: Optional["DocumentFilter"] = None
-    id: Optional["IDComparator"] = None
-    project: Optional["ProjectFilter"] = None
-    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
-
-
 class DocumentCreateInput(BaseModel):
     color: Optional[str] = None
     content: Optional[str] = None
-    content_data: Optional[Any] = Field(alias="contentData", default=None)
     icon: Optional[str] = None
     id: Optional[str] = None
     initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
@@ -524,8 +634,10 @@ class DocumentCreateInput(BaseModel):
         alias="lastAppliedTemplateId", default=None
     )
     project_id: Optional[str] = Field(alias="projectId", default=None)
+    resource_folder_id: Optional[str] = Field(alias="resourceFolderId", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
     subscriber_ids: Optional[List[str]] = Field(alias="subscriberIds", default=None)
+    team_id: Optional[str] = Field(alias="teamId", default=None)
     title: str
 
 
@@ -545,7 +657,6 @@ class DocumentFilter(BaseModel):
 class DocumentUpdateInput(BaseModel):
     color: Optional[str] = None
     content: Optional[str] = None
-    content_data: Optional[Any] = Field(alias="contentData", default=None)
     hidden_at: Optional[Any] = Field(alias="hiddenAt", default=None)
     icon: Optional[str] = None
     initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
@@ -553,8 +664,10 @@ class DocumentUpdateInput(BaseModel):
         alias="lastAppliedTemplateId", default=None
     )
     project_id: Optional[str] = Field(alias="projectId", default=None)
+    resource_folder_id: Optional[str] = Field(alias="resourceFolderId", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
     subscriber_ids: Optional[List[str]] = Field(alias="subscriberIds", default=None)
+    team_id: Optional[str] = Field(alias="teamId", default=None)
     title: Optional[str] = None
     trashed: Optional[bool] = None
 
@@ -571,7 +684,11 @@ class EmailIntakeAddressCreateInput(BaseModel):
 
 
 class EmailIntakeAddressUpdateInput(BaseModel):
-    enabled: bool
+    customer_requests_enabled: Optional[bool] = Field(
+        alias="customerRequestsEnabled", default=None
+    )
+    enabled: Optional[bool] = None
+    replies_enabled: Optional[bool] = Field(alias="repliesEnabled", default=None)
 
 
 class EmailUnsubscribeInput(BaseModel):
@@ -586,7 +703,6 @@ class EmailUserAccountAuthChallengeInput(BaseModel):
     invite_link: Optional[str] = Field(alias="inviteLink", default=None)
     is_desktop: Optional[bool] = Field(alias="isDesktop", default=None)
     login_code_only: Optional[bool] = Field(alias="loginCodeOnly", default=None)
-    signup_code: Optional[str] = Field(alias="signupCode", default=None)
 
 
 class EmojiCreateInput(BaseModel):
@@ -600,12 +716,15 @@ class EntityExternalLinkCreateInput(BaseModel):
     initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
     label: str
     project_id: Optional[str] = Field(alias="projectId", default=None)
+    resource_folder_id: Optional[str] = Field(alias="resourceFolderId", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
+    team_id: Optional[str] = Field(alias="teamId", default=None)
     url: str
 
 
 class EntityExternalLinkUpdateInput(BaseModel):
     label: Optional[str] = None
+    resource_folder_id: Optional[str] = Field(alias="resourceFolderId", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
     url: Optional[str] = None
 
@@ -631,7 +750,9 @@ class EstimateSort(BaseModel):
 
 class FavoriteCreateInput(BaseModel):
     custom_view_id: Optional[str] = Field(alias="customViewId", default=None)
+    customer_id: Optional[str] = Field(alias="customerId", default=None)
     cycle_id: Optional[str] = Field(alias="cycleId", default=None)
+    dashboard_id: Optional[str] = Field(alias="dashboardId", default=None)
     document_id: Optional[str] = Field(alias="documentId", default=None)
     facet_id: Optional[str] = Field(alias="facetId", default=None)
     folder_name: Optional[str] = Field(alias="folderName", default=None)
@@ -648,6 +769,7 @@ class FavoriteCreateInput(BaseModel):
         alias="predefinedViewType", default=None
     )
     project_id: Optional[str] = Field(alias="projectId", default=None)
+    project_label_id: Optional[str] = Field(alias="projectLabelId", default=None)
     project_tab: Optional[ProjectTab] = Field(alias="projectTab", default=None)
     roadmap_id: Optional[str] = Field(alias="roadmapId", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
@@ -658,6 +780,28 @@ class FavoriteUpdateInput(BaseModel):
     folder_name: Optional[str] = Field(alias="folderName", default=None)
     parent_id: Optional[str] = Field(alias="parentId", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
+
+
+class FeedItemFilter(BaseModel):
+    and_: Optional[List["FeedItemFilter"]] = Field(alias="and", default=None)
+    author: Optional["UserFilter"] = None
+    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
+    id: Optional["IDComparator"] = None
+    or_: Optional[List["FeedItemFilter"]] = Field(alias="or", default=None)
+    project_update: Optional["ProjectUpdateFilter"] = Field(
+        alias="projectUpdate", default=None
+    )
+    related_initiatives: Optional["InitiativeCollectionFilter"] = Field(
+        alias="relatedInitiatives", default=None
+    )
+    related_teams: Optional["TeamCollectionFilter"] = Field(
+        alias="relatedTeams", default=None
+    )
+    update_health: Optional["StringComparator"] = Field(
+        alias="updateHealth", default=None
+    )
+    update_type: Optional["StringComparator"] = Field(alias="updateType", default=None)
+    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
 class FrontSettingsInput(BaseModel):
@@ -679,7 +823,6 @@ class FrontSettingsInput(BaseModel):
 
 
 class GitAutomationStateCreateInput(BaseModel):
-    branch_pattern: Optional[str] = Field(alias="branchPattern", default=None)
     event: GitAutomationStates
     id: Optional[str] = None
     state_id: Optional[str] = Field(alias="stateId", default=None)
@@ -688,7 +831,6 @@ class GitAutomationStateCreateInput(BaseModel):
 
 
 class GitAutomationStateUpdateInput(BaseModel):
-    branch_pattern: Optional[str] = Field(alias="branchPattern", default=None)
     event: Optional[GitAutomationStates] = None
     state_id: Optional[str] = Field(alias="stateId", default=None)
     target_branch_id: Optional[str] = Field(alias="targetBranchId", default=None)
@@ -719,6 +861,7 @@ class GitHubPersonalSettingsInput(BaseModel):
 
 
 class GitHubRepoInput(BaseModel):
+    archived: Optional[bool] = None
     full_name: str = Field(alias="fullName")
     id: float
 
@@ -728,6 +871,7 @@ class GitHubRepoMappingInput(BaseModel):
     default: Optional[bool] = None
     git_hub_labels: Optional[List[str]] = Field(alias="gitHubLabels", default=None)
     git_hub_repo_id: float = Field(alias="gitHubRepoId")
+    id: str
     linear_team_id: str = Field(alias="linearTeamId")
 
 
@@ -735,6 +879,9 @@ class GitHubSettingsInput(BaseModel):
     org_avatar_url: Optional[str] = Field(alias="orgAvatarUrl", default=None)
     org_login: str = Field(alias="orgLogin")
     org_type: Optional[GithubOrgType] = Field(alias="orgType", default=None)
+    pull_request_review_tool: Optional[PullRequestReviewTool] = Field(
+        alias="pullRequestReviewTool", default=None
+    )
     repositories: Optional[List["GitHubRepoInput"]] = None
     repositories_mapping: Optional[List["GitHubRepoMappingInput"]] = Field(
         alias="repositoriesMapping", default=None
@@ -747,10 +894,20 @@ class GitLabSettingsInput(BaseModel):
     url: Optional[str] = None
 
 
+class GoogleSheetsExportSettings(BaseModel):
+    enabled: Optional[bool] = None
+    sheet_id: Optional[float] = Field(alias="sheetId", default=None)
+    spreadsheet_id: Optional[str] = Field(alias="spreadsheetId", default=None)
+    spreadsheet_url: Optional[str] = Field(alias="spreadsheetUrl", default=None)
+    updated_at: Optional[Any] = Field(alias="updatedAt", default=None)
+
+
 class GoogleSheetsSettingsInput(BaseModel):
-    sheet_id: float = Field(alias="sheetId")
-    spreadsheet_id: str = Field(alias="spreadsheetId")
-    spreadsheet_url: str = Field(alias="spreadsheetUrl")
+    issue: Optional["GoogleSheetsExportSettings"] = None
+    project: Optional["GoogleSheetsExportSettings"] = None
+    sheet_id: Optional[float] = Field(alias="sheetId", default=None)
+    spreadsheet_id: Optional[str] = Field(alias="spreadsheetId", default=None)
+    spreadsheet_url: Optional[str] = Field(alias="spreadsheetUrl", default=None)
     updated_issues_at: Optional[Any] = Field(alias="updatedIssuesAt", default=None)
 
 
@@ -759,8 +916,6 @@ class GoogleUserAccountAuthInput(BaseModel):
     disallow_signup: Optional[bool] = Field(alias="disallowSignup", default=None)
     invite_link: Optional[str] = Field(alias="inviteLink", default=None)
     redirect_uri: Optional[str] = Field(alias="redirectUri", default=None)
-    signup_code: Optional[str] = Field(alias="signupCode", default=None)
-    team_ids_to_join: Optional[List[str]] = Field(alias="teamIdsToJoin", default=None)
     timezone: str
 
 
@@ -771,17 +926,28 @@ class IDComparator(BaseModel):
     nin: Optional[List[str]] = None
 
 
+class InheritanceEntityMapping(BaseModel):
+    issue_labels: Optional[Any] = Field(alias="issueLabels", default=None)
+    workflow_states: Any = Field(alias="workflowStates")
+
+
 class InitiativeCollectionFilter(BaseModel):
+    ancestors: Optional["InitiativeCollectionFilter"] = None
     and_: Optional[List["InitiativeCollectionFilter"]] = Field(
         alias="and", default=None
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["UserFilter"] = None
     every: Optional["InitiativeFilter"] = None
+    health: Optional["StringComparator"] = None
+    health_with_age: Optional["StringComparator"] = Field(
+        alias="healthWithAge", default=None
+    )
     id: Optional["IDComparator"] = None
     length: Optional["NumberComparator"] = None
     name: Optional["StringComparator"] = None
     or_: Optional[List["InitiativeCollectionFilter"]] = Field(alias="or", default=None)
+    owner: Optional["UserFilter"] = None
     slug_id: Optional["StringComparator"] = Field(alias="slugId", default=None)
     some: Optional["InitiativeFilter"] = None
     status: Optional["StringComparator"] = None
@@ -790,6 +956,7 @@ class InitiativeCollectionFilter(BaseModel):
 
 class InitiativeCreateInput(BaseModel):
     color: Optional[str] = None
+    content: Optional[str] = None
     description: Optional[str] = None
     icon: Optional[str] = None
     id: Optional[str] = None
@@ -804,15 +971,32 @@ class InitiativeCreateInput(BaseModel):
 
 
 class InitiativeFilter(BaseModel):
+    ancestors: Optional["InitiativeCollectionFilter"] = None
     and_: Optional[List["InitiativeFilter"]] = Field(alias="and", default=None)
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["UserFilter"] = None
+    health: Optional["StringComparator"] = None
+    health_with_age: Optional["StringComparator"] = Field(
+        alias="healthWithAge", default=None
+    )
     id: Optional["IDComparator"] = None
     name: Optional["StringComparator"] = None
     or_: Optional[List["InitiativeFilter"]] = Field(alias="or", default=None)
+    owner: Optional["UserFilter"] = None
     slug_id: Optional["StringComparator"] = Field(alias="slugId", default=None)
     status: Optional["StringComparator"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+
+
+class InitiativeRelationCreateInput(BaseModel):
+    id: Optional[str] = None
+    initiative_id: str = Field(alias="initiativeId")
+    related_initiative_id: str = Field(alias="relatedInitiativeId")
+    sort_order: Optional[float] = Field(alias="sortOrder", default=None)
+
+
+class InitiativeRelationUpdateInput(BaseModel):
+    sort_order: Optional[float] = Field(alias="sortOrder", default=None)
 
 
 class InitiativeToProjectCreateInput(BaseModel):
@@ -826,9 +1010,33 @@ class InitiativeToProjectUpdateInput(BaseModel):
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
 
 
+class InitiativeUpdateCreateInput(BaseModel):
+    body: Optional[str] = None
+    body_data: Optional[Any] = Field(alias="bodyData", default=None)
+    health: Optional[InitiativeUpdateHealthType] = None
+    id: Optional[str] = None
+    initiative_id: str = Field(alias="initiativeId")
+    is_diff_hidden: Optional[bool] = Field(alias="isDiffHidden", default=None)
+
+
+class InitiativeUpdateFilter(BaseModel):
+    and_: Optional[List["InitiativeUpdateFilter"]] = Field(alias="and", default=None)
+    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
+    id: Optional["IDComparator"] = None
+    initiative: Optional["InitiativeFilter"] = None
+    or_: Optional[List["InitiativeUpdateFilter"]] = Field(alias="or", default=None)
+    reactions: Optional["ReactionCollectionFilter"] = None
+    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+    user: Optional["UserFilter"] = None
+
+
 class InitiativeUpdateInput(BaseModel):
     color: Optional[str] = None
+    content: Optional[str] = None
     description: Optional[str] = None
+    frequency_resolution: Optional[FrequencyResolutionType] = Field(
+        alias="frequencyResolution", default=None
+    )
     icon: Optional[str] = None
     name: Optional[str] = None
     owner_id: Optional[str] = Field(alias="ownerId", default=None)
@@ -839,6 +1047,29 @@ class InitiativeUpdateInput(BaseModel):
         alias="targetDateResolution", default=None
     )
     trashed: Optional[bool] = None
+    update_reminder_frequency: Optional[float] = Field(
+        alias="updateReminderFrequency", default=None
+    )
+    update_reminder_frequency_in_weeks: Optional[float] = Field(
+        alias="updateReminderFrequencyInWeeks", default=None
+    )
+    update_reminders_day: Optional[Day] = Field(
+        alias="updateRemindersDay", default=None
+    )
+    update_reminders_hour: Optional[int] = Field(
+        alias="updateRemindersHour", default=None
+    )
+
+
+class InitiativeUpdateUpdateInput(BaseModel):
+    body: Optional[str] = None
+    body_data: Optional[Any] = Field(alias="bodyData", default=None)
+    health: Optional[InitiativeUpdateHealthType] = None
+    is_diff_hidden: Optional[bool] = Field(alias="isDiffHidden", default=None)
+
+
+class IntegrationCustomerDataAttributesRefreshInput(BaseModel):
+    service: str
 
 
 class IntegrationRequestInput(BaseModel):
@@ -870,6 +1101,7 @@ class IntegrationSettingsInput(BaseModel):
     notion: Optional["NotionSettingsInput"] = None
     opsgenie: Optional["OpsgenieInput"] = None
     pager_duty: Optional["PagerDutyInput"] = Field(alias="pagerDuty", default=None)
+    salesforce: Optional["SalesforceSettingsInput"] = None
     sentry: Optional["SentrySettingsInput"] = None
     slack: Optional["SlackSettingsInput"] = None
     slack_asks: Optional["SlackAsksSettingsInput"] = Field(
@@ -877,6 +1109,12 @@ class IntegrationSettingsInput(BaseModel):
     )
     slack_custom_view_notifications: Optional["SlackPostSettingsInput"] = Field(
         alias="slackCustomViewNotifications", default=None
+    )
+    slack_initiative_post: Optional["SlackPostSettingsInput"] = Field(
+        alias="slackInitiativePost", default=None
+    )
+    slack_org_initiative_updates_post: Optional["SlackPostSettingsInput"] = Field(
+        alias="slackOrgInitiativeUpdatesPost", default=None
     )
     slack_org_project_updates_post: Optional["SlackPostSettingsInput"] = Field(
         alias="slackOrgProjectUpdatesPost", default=None
@@ -897,9 +1135,21 @@ class IntegrationTemplateCreateInput(BaseModel):
     template_id: str = Field(alias="templateId")
 
 
+class IntegrationUpdateInput(BaseModel):
+    settings: Optional["IntegrationSettingsInput"] = None
+
+
 class IntegrationsSettingsCreateInput(BaseModel):
+    context_view_type: Optional[ContextViewType] = Field(
+        alias="contextViewType", default=None
+    )
+    custom_view_id: Optional[str] = Field(alias="customViewId", default=None)
     id: Optional[str] = None
+    initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
     project_id: Optional[str] = Field(alias="projectId", default=None)
+    slack_initiative_update_created: Optional[bool] = Field(
+        alias="slackInitiativeUpdateCreated", default=None
+    )
     slack_issue_added_to_triage: Optional[bool] = Field(
         alias="slackIssueAddedToTriage", default=None
     )
@@ -935,6 +1185,9 @@ class IntegrationsSettingsCreateInput(BaseModel):
 
 
 class IntegrationsSettingsUpdateInput(BaseModel):
+    slack_initiative_update_created: Optional[bool] = Field(
+        alias="slackInitiativeUpdateCreated", default=None
+    )
     slack_issue_added_to_triage: Optional[bool] = Field(
         alias="slackIssueAddedToTriage", default=None
     )
@@ -986,8 +1239,24 @@ class IntercomSettingsInput(BaseModel):
     )
 
 
+class IssueBatchCreateInput(BaseModel):
+    issues: List["IssueCreateInput"]
+
+
 class IssueCollectionFilter(BaseModel):
+    added_to_cycle_at: Optional["NullableDateComparator"] = Field(
+        alias="addedToCycleAt", default=None
+    )
+    added_to_cycle_period: Optional["CyclePeriodComparator"] = Field(
+        alias="addedToCyclePeriod", default=None
+    )
+    age_time: Optional["NullableDurationComparator"] = Field(
+        alias="ageTime", default=None
+    )
     and_: Optional[List["IssueCollectionFilter"]] = Field(alias="and", default=None)
+    archived_at: Optional["NullableDateComparator"] = Field(
+        alias="archivedAt", default=None
+    )
     assignee: Optional["NullableUserFilter"] = None
     attachments: Optional["AttachmentCollectionFilter"] = None
     auto_archived_at: Optional["NullableDateComparator"] = Field(
@@ -1006,7 +1275,13 @@ class IssueCollectionFilter(BaseModel):
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["NullableUserFilter"] = None
+    customer_count: Optional["NumberComparator"] = Field(
+        alias="customerCount", default=None
+    )
     cycle: Optional["NullableCycleFilter"] = None
+    cycle_time: Optional["NullableDurationComparator"] = Field(
+        alias="cycleTime", default=None
+    )
     description: Optional["NullableStringComparator"] = None
     due_date: Optional["NullableTimelessDateComparator"] = Field(
         alias="dueDate", default=None
@@ -1025,10 +1300,28 @@ class IssueCollectionFilter(BaseModel):
     has_related_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasRelatedRelations", default=None
     )
+    has_suggested_assignees: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedAssignees", default=None
+    )
+    has_suggested_labels: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedLabels", default=None
+    )
+    has_suggested_projects: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedProjects", default=None
+    )
+    has_suggested_related_issues: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedRelatedIssues", default=None
+    )
+    has_suggested_similar_issues: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedSimilarIssues", default=None
+    )
     id: Optional["IDComparator"] = None
     labels: Optional["IssueLabelCollectionFilter"] = None
     last_applied_template: Optional["NullableTemplateFilter"] = Field(
         alias="lastAppliedTemplate", default=None
+    )
+    lead_time: Optional["NullableDurationComparator"] = Field(
+        alias="leadTime", default=None
     )
     length: Optional["NumberComparator"] = None
     needs: Optional["CustomerNeedCollectionFilter"] = None
@@ -1041,6 +1334,9 @@ class IssueCollectionFilter(BaseModel):
         alias="projectMilestone", default=None
     )
     reactions: Optional["ReactionCollectionFilter"] = None
+    recurring_issue_template: Optional["NullableTemplateFilter"] = Field(
+        alias="recurringIssueTemplate", default=None
+    )
     searchable_content: Optional["ContentComparator"] = Field(
         alias="searchableContent", default=None
     )
@@ -1060,6 +1356,9 @@ class IssueCollectionFilter(BaseModel):
     subscribers: Optional["UserCollectionFilter"] = None
     team: Optional["TeamFilter"] = None
     title: Optional["StringComparator"] = None
+    triage_time: Optional["NullableDurationComparator"] = Field(
+        alias="triageTime", default=None
+    )
     triaged_at: Optional["NullableDateComparator"] = Field(
         alias="triagedAt", default=None
     )
@@ -1068,7 +1367,6 @@ class IssueCollectionFilter(BaseModel):
 
 class IssueCreateInput(BaseModel):
     assignee_id: Optional[str] = Field(alias="assigneeId", default=None)
-    board_order: Optional[float] = Field(alias="boardOrder", default=None)
     completed_at: Optional[Any] = Field(alias="completedAt", default=None)
     create_as_user: Optional[str] = Field(alias="createAsUser", default=None)
     created_at: Optional[Any] = Field(alias="createdAt", default=None)
@@ -1099,8 +1397,13 @@ class IssueCreateInput(BaseModel):
         alias="referenceCommentId", default=None
     )
     sla_breaches_at: Optional[Any] = Field(alias="slaBreachesAt", default=None)
+    sla_started_at: Optional[Any] = Field(alias="slaStartedAt", default=None)
+    sla_type: Optional[SLADayCountType] = Field(alias="slaType", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
     source_comment_id: Optional[str] = Field(alias="sourceCommentId", default=None)
+    source_pull_request_comment_id: Optional[str] = Field(
+        alias="sourcePullRequestCommentId", default=None
+    )
     state_id: Optional[str] = Field(alias="stateId", default=None)
     sub_issue_sort_order: Optional[float] = Field(
         alias="subIssueSortOrder", default=None
@@ -1112,7 +1415,19 @@ class IssueCreateInput(BaseModel):
 
 
 class IssueFilter(BaseModel):
+    added_to_cycle_at: Optional["NullableDateComparator"] = Field(
+        alias="addedToCycleAt", default=None
+    )
+    added_to_cycle_period: Optional["CyclePeriodComparator"] = Field(
+        alias="addedToCyclePeriod", default=None
+    )
+    age_time: Optional["NullableDurationComparator"] = Field(
+        alias="ageTime", default=None
+    )
     and_: Optional[List["IssueFilter"]] = Field(alias="and", default=None)
+    archived_at: Optional["NullableDateComparator"] = Field(
+        alias="archivedAt", default=None
+    )
     assignee: Optional["NullableUserFilter"] = None
     attachments: Optional["AttachmentCollectionFilter"] = None
     auto_archived_at: Optional["NullableDateComparator"] = Field(
@@ -1131,7 +1446,13 @@ class IssueFilter(BaseModel):
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["NullableUserFilter"] = None
+    customer_count: Optional["NumberComparator"] = Field(
+        alias="customerCount", default=None
+    )
     cycle: Optional["NullableCycleFilter"] = None
+    cycle_time: Optional["NullableDurationComparator"] = Field(
+        alias="cycleTime", default=None
+    )
     description: Optional["NullableStringComparator"] = None
     due_date: Optional["NullableTimelessDateComparator"] = Field(
         alias="dueDate", default=None
@@ -1149,10 +1470,28 @@ class IssueFilter(BaseModel):
     has_related_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasRelatedRelations", default=None
     )
+    has_suggested_assignees: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedAssignees", default=None
+    )
+    has_suggested_labels: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedLabels", default=None
+    )
+    has_suggested_projects: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedProjects", default=None
+    )
+    has_suggested_related_issues: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedRelatedIssues", default=None
+    )
+    has_suggested_similar_issues: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedSimilarIssues", default=None
+    )
     id: Optional["IDComparator"] = None
     labels: Optional["IssueLabelCollectionFilter"] = None
     last_applied_template: Optional["NullableTemplateFilter"] = Field(
         alias="lastAppliedTemplate", default=None
+    )
+    lead_time: Optional["NullableDurationComparator"] = Field(
+        alias="leadTime", default=None
     )
     needs: Optional["CustomerNeedCollectionFilter"] = None
     number: Optional["NumberComparator"] = None
@@ -1164,6 +1503,9 @@ class IssueFilter(BaseModel):
         alias="projectMilestone", default=None
     )
     reactions: Optional["ReactionCollectionFilter"] = None
+    recurring_issue_template: Optional["NullableTemplateFilter"] = Field(
+        alias="recurringIssueTemplate", default=None
+    )
     searchable_content: Optional["ContentComparator"] = Field(
         alias="searchableContent", default=None
     )
@@ -1182,16 +1524,13 @@ class IssueFilter(BaseModel):
     subscribers: Optional["UserCollectionFilter"] = None
     team: Optional["TeamFilter"] = None
     title: Optional["StringComparator"] = None
+    triage_time: Optional["NullableDurationComparator"] = Field(
+        alias="triageTime", default=None
+    )
     triaged_at: Optional["NullableDateComparator"] = Field(
         alias="triagedAt", default=None
     )
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
-
-
-class IssueImportMappingInput(BaseModel):
-    epics: Optional[Any] = None
-    users: Optional[Any] = None
-    workflow_states: Optional[Any] = Field(alias="workflowStates", default=None)
 
 
 class IssueImportUpdateInput(BaseModel):
@@ -1206,8 +1545,10 @@ class IssueLabelCollectionFilter(BaseModel):
     creator: Optional["NullableUserFilter"] = None
     every: Optional["IssueLabelFilter"] = None
     id: Optional["IDComparator"] = None
+    is_group: Optional["BooleanComparator"] = Field(alias="isGroup", default=None)
     length: Optional["NumberComparator"] = None
     name: Optional["StringComparator"] = None
+    null: Optional[bool] = None
     or_: Optional[List["IssueLabelCollectionFilter"]] = Field(alias="or", default=None)
     parent: Optional["IssueLabelFilter"] = None
     some: Optional["IssueLabelFilter"] = None
@@ -1219,6 +1560,7 @@ class IssueLabelCreateInput(BaseModel):
     color: Optional[str] = None
     description: Optional[str] = None
     id: Optional[str] = None
+    is_group: Optional[bool] = Field(alias="isGroup", default=None)
     name: str
     parent_id: Optional[str] = Field(alias="parentId", default=None)
     team_id: Optional[str] = Field(alias="teamId", default=None)
@@ -1229,6 +1571,7 @@ class IssueLabelFilter(BaseModel):
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["NullableUserFilter"] = None
     id: Optional["IDComparator"] = None
+    is_group: Optional["BooleanComparator"] = Field(alias="isGroup", default=None)
     name: Optional["StringComparator"] = None
     or_: Optional[List["IssueLabelFilter"]] = Field(alias="or", default=None)
     parent: Optional["IssueLabelFilter"] = None
@@ -1260,14 +1603,27 @@ class IssueSortInput(BaseModel):
     assignee: Optional["AssigneeSort"] = None
     completed_at: Optional["CompletedAtSort"] = Field(alias="completedAt", default=None)
     created_at: Optional["CreatedAtSort"] = Field(alias="createdAt", default=None)
+    customer: Optional["CustomerSort"] = None
+    customer_count: Optional["CustomerCountSort"] = Field(
+        alias="customerCount", default=None
+    )
+    customer_important_count: Optional["CustomerImportantCountSort"] = Field(
+        alias="customerImportantCount", default=None
+    )
+    customer_revenue: Optional["CustomerRevenueSort"] = Field(
+        alias="customerRevenue", default=None
+    )
     cycle: Optional["CycleSort"] = None
     due_date: Optional["DueDateSort"] = Field(alias="dueDate", default=None)
     estimate: Optional["EstimateSort"] = None
     label: Optional["LabelSort"] = None
+    label_group: Optional["LabelGroupSort"] = Field(alias="labelGroup", default=None)
+    link_count: Optional["LinkCountSort"] = Field(alias="linkCount", default=None)
     manual: Optional["ManualSort"] = None
     milestone: Optional["MilestoneSort"] = None
     priority: Optional["PrioritySort"] = None
     project: Optional["ProjectSort"] = None
+    root_issue: Optional["RootIssueSort"] = Field(alias="rootIssue", default=None)
     sla_status: Optional["SlaStatusSort"] = Field(alias="slaStatus", default=None)
     team: Optional["TeamSort"] = None
     title: Optional["TitleSort"] = None
@@ -1278,8 +1634,11 @@ class IssueSortInput(BaseModel):
 
 
 class IssueUpdateInput(BaseModel):
+    added_label_ids: Optional[List[str]] = Field(alias="addedLabelIds", default=None)
     assignee_id: Optional[str] = Field(alias="assigneeId", default=None)
-    board_order: Optional[float] = Field(alias="boardOrder", default=None)
+    auto_closed_by_parent_closing: Optional[bool] = Field(
+        alias="autoClosedByParentClosing", default=None
+    )
     cycle_id: Optional[str] = Field(alias="cycleId", default=None)
     description: Optional[str] = None
     description_data: Optional[Any] = Field(alias="descriptionData", default=None)
@@ -1298,7 +1657,12 @@ class IssueUpdateInput(BaseModel):
     project_milestone_id: Optional[str] = Field(
         alias="projectMilestoneId", default=None
     )
+    removed_label_ids: Optional[List[str]] = Field(
+        alias="removedLabelIds", default=None
+    )
     sla_breaches_at: Optional[Any] = Field(alias="slaBreachesAt", default=None)
+    sla_started_at: Optional[Any] = Field(alias="slaStartedAt", default=None)
+    sla_type: Optional[SLADayCountType] = Field(alias="slaType", default=None)
     snoozed_by_id: Optional[str] = Field(alias="snoozedById", default=None)
     snoozed_until_at: Optional[Any] = Field(alias="snoozedUntilAt", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
@@ -1317,7 +1681,6 @@ class JiraConfigurationInput(BaseModel):
     email: str
     hostname: str
     manual_setup: Optional[bool] = Field(alias="manualSetup", default=None)
-    project: Optional[str] = None
 
 
 class JiraLinearMappingInput(BaseModel):
@@ -1339,6 +1702,7 @@ class JiraProjectDataInput(BaseModel):
 
 class JiraSettingsInput(BaseModel):
     is_jira_server: Optional[bool] = Field(alias="isJiraServer", default=False)
+    label: Optional[str] = None
     manual_setup: Optional[bool] = Field(alias="manualSetup", default=None)
     project_mapping: Optional[List["JiraLinearMappingInput"]] = Field(
         alias="projectMapping", default=None
@@ -1348,7 +1712,9 @@ class JiraSettingsInput(BaseModel):
 
 
 class JiraUpdateInput(BaseModel):
+    access_token: Optional[str] = Field(alias="accessToken", default=None)
     delete_webhook: Optional[bool] = Field(alias="deleteWebhook", default=None)
+    email: Optional[str] = None
     id: str
     update_metadata: Optional[bool] = Field(alias="updateMetadata", default=None)
     update_projects: Optional[bool] = Field(alias="updateProjects", default=None)
@@ -1358,6 +1724,12 @@ class JiraUpdateInput(BaseModel):
 class JoinOrganizationInput(BaseModel):
     invite_link: Optional[str] = Field(alias="inviteLink", default=None)
     organization_id: str = Field(alias="organizationId")
+
+
+class LabelGroupSort(BaseModel):
+    label_group_id: str = Field(alias="labelGroupId")
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class LabelSort(BaseModel):
@@ -1370,6 +1742,11 @@ class LaunchDarklySettingsInput(BaseModel):
     project_key: str = Field(alias="projectKey")
 
 
+class LinkCountSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
+
+
 class ManualSort(BaseModel):
     nulls: Optional[PaginationNulls] = PaginationNulls.last
     order: Optional[PaginationSortOrder] = None
@@ -1380,10 +1757,38 @@ class MilestoneSort(BaseModel):
     order: Optional[PaginationSortOrder] = None
 
 
-class NotificationDeliveryPreferencesChannelInput(BaseModel):
-    notifications_disabled: Optional[bool] = Field(
-        alias="notificationsDisabled", default=None
+class NameSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
+
+
+class NotificationCategoryPreferencesInput(BaseModel):
+    apps_and_integrations: Optional["PartialNotificationChannelPreferencesInput"] = (
+        Field(alias="appsAndIntegrations", default=None)
     )
+    assignments: Optional["PartialNotificationChannelPreferencesInput"] = None
+    comments_and_replies: Optional["PartialNotificationChannelPreferencesInput"] = (
+        Field(alias="commentsAndReplies", default=None)
+    )
+    customers: Optional["PartialNotificationChannelPreferencesInput"] = None
+    document_changes: Optional["PartialNotificationChannelPreferencesInput"] = Field(
+        alias="documentChanges", default=None
+    )
+    mentions: Optional["PartialNotificationChannelPreferencesInput"] = None
+    posts_and_updates: Optional["PartialNotificationChannelPreferencesInput"] = Field(
+        alias="postsAndUpdates", default=None
+    )
+    reactions: Optional["PartialNotificationChannelPreferencesInput"] = None
+    reminders: Optional["PartialNotificationChannelPreferencesInput"] = None
+    reviews: Optional["PartialNotificationChannelPreferencesInput"] = None
+    status_changes: Optional["PartialNotificationChannelPreferencesInput"] = Field(
+        alias="statusChanges", default=None
+    )
+    subscriptions: Optional["PartialNotificationChannelPreferencesInput"] = None
+    triage: Optional["PartialNotificationChannelPreferencesInput"] = None
+
+
+class NotificationDeliveryPreferencesChannelInput(BaseModel):
     schedule: Optional["NotificationDeliveryPreferencesScheduleInput"] = None
 
 
@@ -1410,6 +1815,9 @@ class NotificationDeliveryPreferencesScheduleInput(BaseModel):
 class NotificationEntityInput(BaseModel):
     id: Optional[str] = None
     initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
+    initiative_update_id: Optional[str] = Field(
+        alias="initiativeUpdateId", default=None
+    )
     issue_id: Optional[str] = Field(alias="issueId", default=None)
     oauth_client_approval_id: Optional[str] = Field(
         alias="oauthClientApprovalId", default=None
@@ -1434,6 +1842,7 @@ class NotificationSubscriptionCreateInput(BaseModel):
         alias="contextViewType", default=None
     )
     custom_view_id: Optional[str] = Field(alias="customViewId", default=None)
+    customer_id: Optional[str] = Field(alias="customerId", default=None)
     cycle_id: Optional[str] = Field(alias="cycleId", default=None)
     id: Optional[str] = None
     initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
@@ -1457,6 +1866,9 @@ class NotificationSubscriptionUpdateInput(BaseModel):
 
 
 class NotificationUpdateInput(BaseModel):
+    initiative_update_id: Optional[str] = Field(
+        alias="initiativeUpdateId", default=None
+    )
     project_update_id: Optional[str] = Field(alias="projectUpdateId", default=None)
     read_at: Optional[Any] = Field(alias="readAt", default=None)
     snoozed_until_at: Optional[Any] = Field(alias="snoozedUntilAt", default=None)
@@ -1471,7 +1883,7 @@ class NullableCommentFilter(BaseModel):
     and_: Optional[List["NullableCommentFilter"]] = Field(alias="and", default=None)
     body: Optional["StringComparator"] = None
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    document_content: Optional["DocumentContentFilter"] = Field(
+    document_content: Optional["NullableDocumentContentFilter"] = Field(
         alias="documentContent", default=None
     )
     id: Optional["IDComparator"] = None
@@ -1480,12 +1892,35 @@ class NullableCommentFilter(BaseModel):
     null: Optional[bool] = None
     or_: Optional[List["NullableCommentFilter"]] = Field(alias="or", default=None)
     parent: Optional["NullableCommentFilter"] = None
-    project_update: Optional["ProjectUpdateFilter"] = Field(
+    project_update: Optional["NullableProjectUpdateFilter"] = Field(
         alias="projectUpdate", default=None
     )
     reactions: Optional["ReactionCollectionFilter"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
     user: Optional["UserFilter"] = None
+
+
+class NullableCustomerFilter(BaseModel):
+    and_: Optional[List["NullableCustomerFilter"]] = Field(alias="and", default=None)
+    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
+    domains: Optional["StringArrayComparator"] = None
+    external_ids: Optional["StringArrayComparator"] = Field(
+        alias="externalIds", default=None
+    )
+    id: Optional["IDComparator"] = None
+    name: Optional["StringComparator"] = None
+    needs: Optional["CustomerNeedCollectionFilter"] = None
+    null: Optional[bool] = None
+    or_: Optional[List["NullableCustomerFilter"]] = Field(alias="or", default=None)
+    owner: Optional["NullableUserFilter"] = None
+    revenue: Optional["NumberComparator"] = None
+    size: Optional["NumberComparator"] = None
+    slack_channel_id: Optional["StringComparator"] = Field(
+        alias="slackChannelId", default=None
+    )
+    status: Optional["CustomerStatusFilter"] = None
+    tier: Optional["CustomerTierFilter"] = None
+    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
 class NullableCycleFilter(BaseModel):
@@ -1525,29 +1960,46 @@ class NullableDateComparator(BaseModel):
 
 
 class NullableDocumentContentFilter(BaseModel):
+    and_: Optional[List["NullableDocumentContentFilter"]] = Field(
+        alias="and", default=None
+    )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     document: Optional["DocumentFilter"] = None
     id: Optional["IDComparator"] = None
-    project: Optional["ProjectFilter"] = None
-    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
-
-
-class NullableDocumentFilter(BaseModel):
-    and_: Optional[List["NullableDocumentFilter"]] = Field(alias="and", default=None)
-    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    creator: Optional["UserFilter"] = None
-    id: Optional["IDComparator"] = None
-    initiative: Optional["InitiativeFilter"] = None
     null: Optional[bool] = None
-    or_: Optional[List["NullableDocumentFilter"]] = Field(alias="or", default=None)
+    or_: Optional[List["NullableDocumentContentFilter"]] = Field(
+        alias="or", default=None
+    )
     project: Optional["ProjectFilter"] = None
-    slug_id: Optional["StringComparator"] = Field(alias="slugId", default=None)
-    title: Optional["StringComparator"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+
+
+class NullableDurationComparator(BaseModel):
+    eq: Optional[Any] = None
+    gt: Optional[Any] = None
+    gte: Optional[Any] = None
+    in_: Optional[List[Any]] = Field(alias="in", default=None)
+    lt: Optional[Any] = None
+    lte: Optional[Any] = None
+    neq: Optional[Any] = None
+    nin: Optional[List[Any]] = None
+    null: Optional[bool] = None
 
 
 class NullableIssueFilter(BaseModel):
+    added_to_cycle_at: Optional["NullableDateComparator"] = Field(
+        alias="addedToCycleAt", default=None
+    )
+    added_to_cycle_period: Optional["CyclePeriodComparator"] = Field(
+        alias="addedToCyclePeriod", default=None
+    )
+    age_time: Optional["NullableDurationComparator"] = Field(
+        alias="ageTime", default=None
+    )
     and_: Optional[List["NullableIssueFilter"]] = Field(alias="and", default=None)
+    archived_at: Optional["NullableDateComparator"] = Field(
+        alias="archivedAt", default=None
+    )
     assignee: Optional["NullableUserFilter"] = None
     attachments: Optional["AttachmentCollectionFilter"] = None
     auto_archived_at: Optional["NullableDateComparator"] = Field(
@@ -1566,7 +2018,13 @@ class NullableIssueFilter(BaseModel):
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["NullableUserFilter"] = None
+    customer_count: Optional["NumberComparator"] = Field(
+        alias="customerCount", default=None
+    )
     cycle: Optional["NullableCycleFilter"] = None
+    cycle_time: Optional["NullableDurationComparator"] = Field(
+        alias="cycleTime", default=None
+    )
     description: Optional["NullableStringComparator"] = None
     due_date: Optional["NullableTimelessDateComparator"] = Field(
         alias="dueDate", default=None
@@ -1584,10 +2042,28 @@ class NullableIssueFilter(BaseModel):
     has_related_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasRelatedRelations", default=None
     )
+    has_suggested_assignees: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedAssignees", default=None
+    )
+    has_suggested_labels: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedLabels", default=None
+    )
+    has_suggested_projects: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedProjects", default=None
+    )
+    has_suggested_related_issues: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedRelatedIssues", default=None
+    )
+    has_suggested_similar_issues: Optional["RelationExistsComparator"] = Field(
+        alias="hasSuggestedSimilarIssues", default=None
+    )
     id: Optional["IDComparator"] = None
     labels: Optional["IssueLabelCollectionFilter"] = None
     last_applied_template: Optional["NullableTemplateFilter"] = Field(
         alias="lastAppliedTemplate", default=None
+    )
+    lead_time: Optional["NullableDurationComparator"] = Field(
+        alias="leadTime", default=None
     )
     needs: Optional["CustomerNeedCollectionFilter"] = None
     null: Optional[bool] = None
@@ -1600,6 +2076,9 @@ class NullableIssueFilter(BaseModel):
         alias="projectMilestone", default=None
     )
     reactions: Optional["ReactionCollectionFilter"] = None
+    recurring_issue_template: Optional["NullableTemplateFilter"] = Field(
+        alias="recurringIssueTemplate", default=None
+    )
     searchable_content: Optional["ContentComparator"] = Field(
         alias="searchableContent", default=None
     )
@@ -1618,6 +2097,9 @@ class NullableIssueFilter(BaseModel):
     subscribers: Optional["UserCollectionFilter"] = None
     team: Optional["TeamFilter"] = None
     title: Optional["StringComparator"] = None
+    triage_time: Optional["NullableDurationComparator"] = Field(
+        alias="triageTime", default=None
+    )
     triaged_at: Optional["NullableDateComparator"] = Field(
         alias="triagedAt", default=None
     )
@@ -1640,7 +2122,13 @@ class NullableProjectFilter(BaseModel):
     accessible_teams: Optional["TeamCollectionFilter"] = Field(
         alias="accessibleTeams", default=None
     )
+    activity_type: Optional["StringComparator"] = Field(
+        alias="activityType", default=None
+    )
     and_: Optional[List["NullableProjectFilter"]] = Field(alias="and", default=None)
+    canceled_at: Optional["NullableDateComparator"] = Field(
+        alias="canceledAt", default=None
+    )
     completed_at: Optional["NullableDateComparator"] = Field(
         alias="completedAt", default=None
     )
@@ -1649,6 +2137,9 @@ class NullableProjectFilter(BaseModel):
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["UserFilter"] = None
+    customer_count: Optional["NumberComparator"] = Field(
+        alias="customerCount", default=None
+    )
     has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasBlockedByRelations", default=None
     )
@@ -1664,10 +2155,17 @@ class NullableProjectFilter(BaseModel):
     has_related_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasRelatedRelations", default=None
     )
+    has_violated_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasViolatedRelations", default=None
+    )
     health: Optional["StringComparator"] = None
+    health_with_age: Optional["StringComparator"] = Field(
+        alias="healthWithAge", default=None
+    )
     id: Optional["IDComparator"] = None
     initiatives: Optional["InitiativeCollectionFilter"] = None
     issues: Optional["IssueCollectionFilter"] = None
+    labels: Optional["ProjectLabelCollectionFilter"] = None
     last_applied_template: Optional["NullableTemplateFilter"] = Field(
         alias="lastAppliedTemplate", default=None
     )
@@ -1709,7 +2207,7 @@ class NullableProjectMilestoneFilter(BaseModel):
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     id: Optional["IDComparator"] = None
-    name: Optional["StringComparator"] = None
+    name: Optional["NullableStringComparator"] = None
     null: Optional[bool] = None
     or_: Optional[List["NullableProjectMilestoneFilter"]] = Field(
         alias="or", default=None
@@ -1720,37 +2218,27 @@ class NullableProjectMilestoneFilter(BaseModel):
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
-class NullableProjectUpdatesFilter(BaseModel):
-    and_: Optional[List["NullableProjectUpdatesFilter"]] = Field(
+class NullableProjectUpdateFilter(BaseModel):
+    and_: Optional[List["NullableProjectUpdateFilter"]] = Field(
         alias="and", default=None
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    health: Optional["StringComparator"] = None
     id: Optional["IDComparator"] = None
     null: Optional[bool] = None
-    or_: Optional[List["NullableProjectUpdatesFilter"]] = Field(
-        alias="or", default=None
-    )
+    or_: Optional[List["NullableProjectUpdateFilter"]] = Field(alias="or", default=None)
+    project: Optional["ProjectFilter"] = None
+    reactions: Optional["ReactionCollectionFilter"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
-
-
-class NullableReactionFilter(BaseModel):
-    and_: Optional[List["NullableReactionFilter"]] = Field(alias="and", default=None)
-    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
-    custom_emoji_id: Optional["IDComparator"] = Field(
-        alias="customEmojiId", default=None
-    )
-    emoji: Optional["StringComparator"] = None
-    id: Optional["IDComparator"] = None
-    null: Optional[bool] = None
-    or_: Optional[List["NullableReactionFilter"]] = Field(alias="or", default=None)
-    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+    user: Optional["UserFilter"] = None
 
 
 class NullableStringComparator(BaseModel):
     contains: Optional[str] = None
     contains_ignore_case: Optional[str] = Field(
         alias="containsIgnoreCase", default=None
+    )
+    contains_ignore_case_and_accent: Optional[str] = Field(
+        alias="containsIgnoreCaseAndAccent", default=None
     )
     ends_with: Optional[str] = Field(alias="endsWith", default=None)
     eq: Optional[str] = None
@@ -1782,6 +2270,7 @@ class NullableTeamFilter(BaseModel):
     name: Optional["StringComparator"] = None
     null: Optional[bool] = None
     or_: Optional[List["NullableTeamFilter"]] = Field(alias="or", default=None)
+    parent: Optional["NullableTeamFilter"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
@@ -1792,6 +2281,7 @@ class NullableTemplateFilter(BaseModel):
     name: Optional["StringComparator"] = None
     null: Optional[bool] = None
     or_: Optional[List["NullableTemplateFilter"]] = Field(alias="or", default=None)
+    type: Optional["StringComparator"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
@@ -1811,6 +2301,7 @@ class NullableUserFilter(BaseModel):
     active: Optional["BooleanComparator"] = None
     admin: Optional["BooleanComparator"] = None
     and_: Optional[List["NullableUserFilter"]] = Field(alias="and", default=None)
+    app: Optional["BooleanComparator"] = None
     assigned_issues: Optional["IssueCollectionFilter"] = Field(
         alias="assignedIssues", default=None
     )
@@ -1820,6 +2311,7 @@ class NullableUserFilter(BaseModel):
     )
     email: Optional["StringComparator"] = None
     id: Optional["IDComparator"] = None
+    invited: Optional["BooleanComparator"] = None
     is_me: Optional["BooleanComparator"] = Field(alias="isMe", default=None)
     name: Optional["StringComparator"] = None
     null: Optional[bool] = None
@@ -1870,7 +2362,6 @@ class OrganizationDomainVerificationInput(BaseModel):
 class OrganizationInviteCreateInput(BaseModel):
     email: str
     id: Optional[str] = None
-    message: Optional[str] = None
     metadata: Optional[Any] = None
     role: Optional[UserRoleType] = UserRoleType.user
     team_ids: Optional[List[str]] = Field(alias="teamIds", default=None)
@@ -1887,13 +2378,29 @@ class OrganizationIpRestrictionInput(BaseModel):
     type: str
 
 
+class OrganizationStartTrialInput(BaseModel):
+    plan_type: str = Field(alias="planType")
+
+
 class OrganizationUpdateInput(BaseModel):
+    ai_addon_enabled: Optional[bool] = Field(alias="aiAddonEnabled", default=None)
+    ai_telemetry_enabled: Optional[bool] = Field(
+        alias="aiTelemetryEnabled", default=None
+    )
     allow_members_to_invite: Optional[bool] = Field(
         alias="allowMembersToInvite", default=None
     )
     allowed_auth_services: Optional[List[str]] = Field(
         alias="allowedAuthServices", default=None
     )
+    customers_configuration: Optional[Any] = Field(
+        alias="customersConfiguration", default=None
+    )
+    customers_enabled: Optional[bool] = Field(alias="customersEnabled", default=None)
+    default_feed_summary_schedule: Optional[FeedSummarySchedule] = Field(
+        alias="defaultFeedSummarySchedule", default=None
+    )
+    feed_enabled: Optional[bool] = Field(alias="feedEnabled", default=None)
     fiscal_year_start_month: Optional[float] = Field(
         alias="fiscalYearStartMonth", default=None
     )
@@ -1904,12 +2411,24 @@ class OrganizationUpdateInput(BaseModel):
     git_public_linkback_messages_enabled: Optional[bool] = Field(
         alias="gitPublicLinkbackMessagesEnabled", default=None
     )
+    initiative_update_reminder_frequency_in_weeks: Optional[float] = Field(
+        alias="initiativeUpdateReminderFrequencyInWeeks", default=None
+    )
+    initiative_update_reminders_day: Optional[Day] = Field(
+        alias="initiativeUpdateRemindersDay", default=None
+    )
+    initiative_update_reminders_hour: Optional[float] = Field(
+        alias="initiativeUpdateRemindersHour", default=None
+    )
     ip_restrictions: Optional[List["OrganizationIpRestrictionInput"]] = Field(
         alias="ipRestrictions", default=None
     )
     logo_url: Optional[str] = Field(alias="logoUrl", default=None)
     name: Optional[str] = None
     oauth_app_review: Optional[bool] = Field(alias="oauthAppReview", default=None)
+    personal_api_keys_enabled: Optional[bool] = Field(
+        alias="personalApiKeysEnabled", default=None
+    )
     project_update_reminder_frequency_in_weeks: Optional[float] = Field(
         alias="projectUpdateReminderFrequencyInWeeks", default=None
     )
@@ -1922,17 +2441,35 @@ class OrganizationUpdateInput(BaseModel):
     reduced_personal_information: Optional[bool] = Field(
         alias="reducedPersonalInformation", default=None
     )
+    restrict_label_management_to_admins: Optional[bool] = Field(
+        alias="restrictLabelManagementToAdmins", default=None
+    )
+    restrict_team_creation_to_admins: Optional[bool] = Field(
+        alias="restrictTeamCreationToAdmins", default=None
+    )
     roadmap_enabled: Optional[bool] = Field(alias="roadmapEnabled", default=None)
-    sla_day_count: Optional[SLADayCountType] = Field(alias="slaDayCount", default=None)
     sla_enabled: Optional[bool] = Field(alias="slaEnabled", default=None)
     theme_settings: Optional[Any] = Field(alias="themeSettings", default=None)
     url_key: Optional[str] = Field(alias="urlKey", default=None)
+    working_days: Optional[List[float]] = Field(alias="workingDays", default=None)
+
+
+class OwnerSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class PagerDutyInput(BaseModel):
     api_failed_with_unauthorized_error_at: Optional[Any] = Field(
         alias="apiFailedWithUnauthorizedErrorAt", default=None
     )
+
+
+class PartialNotificationChannelPreferencesInput(BaseModel):
+    desktop: Optional[bool] = None
+    email: Optional[bool] = None
+    mobile: Optional[bool] = None
+    slack: Optional[bool] = None
 
 
 class PrioritySort(BaseModel):
@@ -1945,7 +2482,13 @@ class ProjectCollectionFilter(BaseModel):
     accessible_teams: Optional["TeamCollectionFilter"] = Field(
         alias="accessibleTeams", default=None
     )
+    activity_type: Optional["StringComparator"] = Field(
+        alias="activityType", default=None
+    )
     and_: Optional[List["ProjectCollectionFilter"]] = Field(alias="and", default=None)
+    canceled_at: Optional["NullableDateComparator"] = Field(
+        alias="canceledAt", default=None
+    )
     completed_at: Optional["NullableDateComparator"] = Field(
         alias="completedAt", default=None
     )
@@ -1954,6 +2497,9 @@ class ProjectCollectionFilter(BaseModel):
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["UserFilter"] = None
+    customer_count: Optional["NumberComparator"] = Field(
+        alias="customerCount", default=None
+    )
     every: Optional["ProjectFilter"] = None
     has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasBlockedByRelations", default=None
@@ -1970,10 +2516,17 @@ class ProjectCollectionFilter(BaseModel):
     has_related_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasRelatedRelations", default=None
     )
+    has_violated_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasViolatedRelations", default=None
+    )
     health: Optional["StringComparator"] = None
+    health_with_age: Optional["StringComparator"] = Field(
+        alias="healthWithAge", default=None
+    )
     id: Optional["IDComparator"] = None
     initiatives: Optional["InitiativeCollectionFilter"] = None
     issues: Optional["IssueCollectionFilter"] = None
+    labels: Optional["ProjectLabelCollectionFilter"] = None
     last_applied_template: Optional["NullableTemplateFilter"] = Field(
         alias="lastAppliedTemplate", default=None
     )
@@ -2012,12 +2565,14 @@ class ProjectCollectionFilter(BaseModel):
 
 class ProjectCreateInput(BaseModel):
     color: Optional[str] = None
+    content: Optional[str] = None
     converted_from_issue_id: Optional[str] = Field(
         alias="convertedFromIssueId", default=None
     )
     description: Optional[str] = None
     icon: Optional[str] = None
     id: Optional[str] = None
+    label_ids: Optional[List[str]] = Field(alias="labelIds", default=None)
     last_applied_template_id: Optional[str] = Field(
         alias="lastAppliedTemplateId", default=None
     )
@@ -2033,7 +2588,6 @@ class ProjectCreateInput(BaseModel):
     start_date_resolution: Optional[DateResolutionType] = Field(
         alias="startDateResolution", default=None
     )
-    state: Optional[str] = None
     status_id: Optional[str] = Field(alias="statusId", default=None)
     target_date: Optional[Any] = Field(alias="targetDate", default=None)
     target_date_resolution: Optional[DateResolutionType] = Field(
@@ -2046,7 +2600,13 @@ class ProjectFilter(BaseModel):
     accessible_teams: Optional["TeamCollectionFilter"] = Field(
         alias="accessibleTeams", default=None
     )
+    activity_type: Optional["StringComparator"] = Field(
+        alias="activityType", default=None
+    )
     and_: Optional[List["ProjectFilter"]] = Field(alias="and", default=None)
+    canceled_at: Optional["NullableDateComparator"] = Field(
+        alias="canceledAt", default=None
+    )
     completed_at: Optional["NullableDateComparator"] = Field(
         alias="completedAt", default=None
     )
@@ -2055,6 +2615,9 @@ class ProjectFilter(BaseModel):
     )
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     creator: Optional["UserFilter"] = None
+    customer_count: Optional["NumberComparator"] = Field(
+        alias="customerCount", default=None
+    )
     has_blocked_by_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasBlockedByRelations", default=None
     )
@@ -2070,10 +2633,17 @@ class ProjectFilter(BaseModel):
     has_related_relations: Optional["RelationExistsComparator"] = Field(
         alias="hasRelatedRelations", default=None
     )
+    has_violated_relations: Optional["RelationExistsComparator"] = Field(
+        alias="hasViolatedRelations", default=None
+    )
     health: Optional["StringComparator"] = None
+    health_with_age: Optional["StringComparator"] = Field(
+        alias="healthWithAge", default=None
+    )
     id: Optional["IDComparator"] = None
     initiatives: Optional["InitiativeCollectionFilter"] = None
     issues: Optional["IssueCollectionFilter"] = None
+    labels: Optional["ProjectLabelCollectionFilter"] = None
     last_applied_template: Optional["NullableTemplateFilter"] = Field(
         alias="lastAppliedTemplate", default=None
     )
@@ -2108,18 +2678,36 @@ class ProjectFilter(BaseModel):
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
-class ProjectLinkCreateInput(BaseModel):
-    id: Optional[str] = None
-    label: str
-    project_id: str = Field(alias="projectId")
-    sort_order: Optional[float] = Field(alias="sortOrder", default=None)
-    url: str
+class ProjectLabelCollectionFilter(BaseModel):
+    and_: Optional[List["ProjectLabelCollectionFilter"]] = Field(
+        alias="and", default=None
+    )
+    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
+    creator: Optional["NullableUserFilter"] = None
+    every: Optional["ProjectLabelFilter"] = None
+    id: Optional["IDComparator"] = None
+    is_group: Optional["BooleanComparator"] = Field(alias="isGroup", default=None)
+    length: Optional["NumberComparator"] = None
+    name: Optional["StringComparator"] = None
+    null: Optional[bool] = None
+    or_: Optional[List["ProjectLabelCollectionFilter"]] = Field(
+        alias="or", default=None
+    )
+    parent: Optional["ProjectLabelFilter"] = None
+    some: Optional["ProjectLabelCollectionFilter"] = None
+    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
-class ProjectLinkUpdateInput(BaseModel):
-    label: Optional[str] = None
-    sort_order: Optional[float] = Field(alias="sortOrder", default=None)
-    url: Optional[str] = None
+class ProjectLabelFilter(BaseModel):
+    and_: Optional[List["ProjectLabelFilter"]] = Field(alias="and", default=None)
+    created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
+    creator: Optional["NullableUserFilter"] = None
+    id: Optional["IDComparator"] = None
+    is_group: Optional["BooleanComparator"] = Field(alias="isGroup", default=None)
+    name: Optional["StringComparator"] = None
+    or_: Optional[List["ProjectLabelFilter"]] = Field(alias="or", default=None)
+    parent: Optional["ProjectLabelFilter"] = None
+    updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
 class ProjectMilestoneCollectionFilter(BaseModel):
@@ -2130,7 +2718,7 @@ class ProjectMilestoneCollectionFilter(BaseModel):
     every: Optional["ProjectMilestoneFilter"] = None
     id: Optional["IDComparator"] = None
     length: Optional["NumberComparator"] = None
-    name: Optional["StringComparator"] = None
+    name: Optional["NullableStringComparator"] = None
     or_: Optional[List["ProjectMilestoneCollectionFilter"]] = Field(
         alias="or", default=None
     )
@@ -2155,7 +2743,7 @@ class ProjectMilestoneFilter(BaseModel):
     and_: Optional[List["ProjectMilestoneFilter"]] = Field(alias="and", default=None)
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
     id: Optional["IDComparator"] = None
-    name: Optional["StringComparator"] = None
+    name: Optional["NullableStringComparator"] = None
     or_: Optional[List["ProjectMilestoneFilter"]] = Field(alias="or", default=None)
     target_date: Optional["NullableDateComparator"] = Field(
         alias="targetDate", default=None
@@ -2163,10 +2751,35 @@ class ProjectMilestoneFilter(BaseModel):
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
+class ProjectMilestoneMoveInput(BaseModel):
+    add_issue_team_to_project: Optional[bool] = Field(
+        alias="addIssueTeamToProject", default=None
+    )
+    new_issue_team_id: Optional[str] = Field(alias="newIssueTeamId", default=None)
+    project_id: str = Field(alias="projectId")
+    undo_issue_team_ids: Optional[List["ProjectMilestoneMoveIssueToTeamInput"]] = Field(
+        alias="undoIssueTeamIds", default=None
+    )
+    undo_project_team_ids: Optional["ProjectMilestoneMoveProjectTeamsInput"] = Field(
+        alias="undoProjectTeamIds", default=None
+    )
+
+
+class ProjectMilestoneMoveIssueToTeamInput(BaseModel):
+    issue_id: str = Field(alias="issueId")
+    team_id: str = Field(alias="teamId")
+
+
+class ProjectMilestoneMoveProjectTeamsInput(BaseModel):
+    project_id: str = Field(alias="projectId")
+    team_ids: List[str] = Field(alias="teamIds")
+
+
 class ProjectMilestoneUpdateInput(BaseModel):
     description: Optional[str] = None
     description_data: Optional[Any] = Field(alias="descriptionData", default=None)
     name: Optional[str] = None
+    project_id: Optional[str] = Field(alias="projectId", default=None)
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
     target_date: Optional[Any] = Field(alias="targetDate", default=None)
 
@@ -2205,6 +2818,16 @@ class ProjectSort(BaseModel):
     order: Optional[PaginationSortOrder] = None
 
 
+class ProjectStatusCreateInput(BaseModel):
+    color: str
+    description: Optional[str] = None
+    id: Optional[str] = None
+    indefinite: Optional[bool] = False
+    name: str
+    position: float
+    type: ProjectStatusType
+
+
 class ProjectStatusFilter(BaseModel):
     and_: Optional[List["ProjectStatusFilter"]] = Field(alias="and", default=None)
     created_at: Optional["DateComparator"] = Field(alias="createdAt", default=None)
@@ -2216,6 +2839,15 @@ class ProjectStatusFilter(BaseModel):
     projects: Optional["ProjectCollectionFilter"] = None
     type: Optional["StringComparator"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
+
+
+class ProjectStatusUpdateInput(BaseModel):
+    color: Optional[str] = None
+    description: Optional[str] = None
+    indefinite: Optional[bool] = None
+    name: Optional[str] = None
+    position: Optional[float] = None
+    type: Optional[ProjectStatusType] = None
 
 
 class ProjectUpdateCreateInput(BaseModel):
@@ -2242,11 +2874,16 @@ class ProjectUpdateInput(BaseModel):
     canceled_at: Optional[Any] = Field(alias="canceledAt", default=None)
     color: Optional[str] = None
     completed_at: Optional[Any] = Field(alias="completedAt", default=None)
+    content: Optional[str] = None
     converted_from_issue_id: Optional[str] = Field(
         alias="convertedFromIssueId", default=None
     )
     description: Optional[str] = None
+    frequency_resolution: Optional[FrequencyResolutionType] = Field(
+        alias="frequencyResolution", default=None
+    )
     icon: Optional[str] = None
+    label_ids: Optional[List[str]] = Field(alias="labelIds", default=None)
     last_applied_template_id: Optional[str] = Field(
         alias="lastAppliedTemplateId", default=None
     )
@@ -2272,7 +2909,6 @@ class ProjectUpdateInput(BaseModel):
     start_date_resolution: Optional[DateResolutionType] = Field(
         alias="startDateResolution", default=None
     )
-    state: Optional[str] = None
     status_id: Optional[str] = Field(alias="statusId", default=None)
     target_date: Optional[Any] = Field(alias="targetDate", default=None)
     target_date_resolution: Optional[DateResolutionType] = Field(
@@ -2280,12 +2916,18 @@ class ProjectUpdateInput(BaseModel):
     )
     team_ids: Optional[List[str]] = Field(alias="teamIds", default=None)
     trashed: Optional[bool] = None
-
-
-class ProjectUpdateInteractionCreateInput(BaseModel):
-    id: Optional[str] = None
-    project_update_id: str = Field(alias="projectUpdateId")
-    read_at: Any = Field(alias="readAt")
+    update_reminder_frequency: Optional[float] = Field(
+        alias="updateReminderFrequency", default=None
+    )
+    update_reminder_frequency_in_weeks: Optional[float] = Field(
+        alias="updateReminderFrequencyInWeeks", default=None
+    )
+    update_reminders_day: Optional[Day] = Field(
+        alias="updateRemindersDay", default=None
+    )
+    update_reminders_hour: Optional[int] = Field(
+        alias="updateRemindersHour", default=None
+    )
 
 
 class ProjectUpdateUpdateInput(BaseModel):
@@ -2324,7 +2966,6 @@ class PushSubscriptionCreateInput(BaseModel):
     data: str
     id: Optional[str] = None
     type: Optional[PushSubscriptionType] = PushSubscriptionType.web
-    user_id: Optional[str] = Field(alias="userId", default=None)
 
 
 class ReactionCollectionFilter(BaseModel):
@@ -2346,8 +2987,16 @@ class ReactionCreateInput(BaseModel):
     comment_id: Optional[str] = Field(alias="commentId", default=None)
     emoji: str
     id: Optional[str] = None
+    initiative_update_id: Optional[str] = Field(
+        alias="initiativeUpdateId", default=None
+    )
     issue_id: Optional[str] = Field(alias="issueId", default=None)
+    post_id: Optional[str] = Field(alias="postId", default=None)
     project_update_id: Optional[str] = Field(alias="projectUpdateId", default=None)
+    pull_request_comment_id: Optional[str] = Field(
+        alias="pullRequestCommentId", default=None
+    )
+    pull_request_id: Optional[str] = Field(alias="pullRequestId", default=None)
 
 
 class ReactionFilter(BaseModel):
@@ -2365,6 +3014,11 @@ class ReactionFilter(BaseModel):
 class RelationExistsComparator(BaseModel):
     eq: Optional[bool] = None
     neq: Optional[bool] = None
+
+
+class RevenueSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class RoadmapCollectionFilter(BaseModel):
@@ -2420,16 +3074,42 @@ class RoadmapUpdateInput(BaseModel):
     sort_order: Optional[float] = Field(alias="sortOrder", default=None)
 
 
+class RootIssueSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
+    sort: "IssueSortInput"
+
+
+class SalesforceSettingsInput(BaseModel):
+    automate_ticket_reopening_on_cancellation: Optional[bool] = Field(
+        alias="automateTicketReopeningOnCancellation", default=None
+    )
+    automate_ticket_reopening_on_comment: Optional[bool] = Field(
+        alias="automateTicketReopeningOnComment", default=None
+    )
+    automate_ticket_reopening_on_completion: Optional[bool] = Field(
+        alias="automateTicketReopeningOnCompletion", default=None
+    )
+    send_note_on_comment: Optional[bool] = Field(
+        alias="sendNoteOnComment", default=None
+    )
+    send_note_on_status_change: Optional[bool] = Field(
+        alias="sendNoteOnStatusChange", default=None
+    )
+    subdomain: Optional[str] = None
+    url: Optional[str] = None
+
+
 class SentrySettingsInput(BaseModel):
+    organization_id: str = Field(alias="organizationId")
     organization_slug: str = Field(alias="organizationSlug")
+    resolving_completes_issues: bool = Field(alias="resolvingCompletesIssues")
+    unresolving_reopens_issues: bool = Field(alias="unresolvingReopensIssues")
 
 
-class SharedSlackSettingsInput(BaseModel):
-    enterprise_id: Optional[str] = Field(alias="enterpriseId", default=None)
-    enterprise_name: Optional[str] = Field(alias="enterpriseName", default=None)
-    should_unfurl: Optional[bool] = Field(alias="shouldUnfurl", default=None)
-    team_id: Optional[str] = Field(alias="teamId", default=None)
-    team_name: Optional[str] = Field(alias="teamName", default=None)
+class SizeSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
 
 
 class SlaStatusComparator(BaseModel):
@@ -2463,6 +3143,7 @@ class SlackAsksTeamSettingsInput(BaseModel):
 
 
 class SlackChannelNameMappingInput(BaseModel):
+    ai_titles: Optional[bool] = Field(alias="aiTitles", default=None)
     auto_create_on_bot_mention: Optional[bool] = Field(
         alias="autoCreateOnBotMention", default=None
     )
@@ -2497,6 +3178,7 @@ class SlackPostSettingsInput(BaseModel):
     channel_id: str = Field(alias="channelId")
     channel_type: Optional[SlackChannelType] = Field(alias="channelType", default=None)
     configuration_url: str = Field(alias="configurationUrl")
+    team_id: Optional[str] = Field(alias="teamId", default=None)
 
 
 class SlackSettingsInput(BaseModel):
@@ -2522,6 +3204,9 @@ class SourceTypeComparator(BaseModel):
     contains_ignore_case: Optional[str] = Field(
         alias="containsIgnoreCase", default=None
     )
+    contains_ignore_case_and_accent: Optional[str] = Field(
+        alias="containsIgnoreCaseAndAccent", default=None
+    )
     ends_with: Optional[str] = Field(alias="endsWith", default=None)
     eq: Optional[str] = None
     eq_ignore_case: Optional[str] = Field(alias="eqIgnoreCase", default=None)
@@ -2542,15 +3227,18 @@ class SourceTypeComparator(BaseModel):
 
 
 class StringArrayComparator(BaseModel):
-    every: Optional[List["StringItemComparator"]] = None
+    every: Optional["StringItemComparator"] = None
     length: Optional["NumberComparator"] = None
-    some: Optional[List["StringItemComparator"]] = None
+    some: Optional["StringItemComparator"] = None
 
 
 class StringComparator(BaseModel):
     contains: Optional[str] = None
     contains_ignore_case: Optional[str] = Field(
         alias="containsIgnoreCase", default=None
+    )
+    contains_ignore_case_and_accent: Optional[str] = Field(
+        alias="containsIgnoreCaseAndAccent", default=None
     )
     ends_with: Optional[str] = Field(alias="endsWith", default=None)
     eq: Optional[str] = None
@@ -2575,6 +3263,9 @@ class StringItemComparator(BaseModel):
     contains: Optional[str] = None
     contains_ignore_case: Optional[str] = Field(
         alias="containsIgnoreCase", default=None
+    )
+    contains_ignore_case_and_accent: Optional[str] = Field(
+        alias="containsIgnoreCaseAndAccent", default=None
     )
     ends_with: Optional[str] = Field(alias="endsWith", default=None)
     eq: Optional[str] = None
@@ -2650,6 +3341,15 @@ class TeamCreateInput(BaseModel):
     group_issue_history: Optional[bool] = Field(alias="groupIssueHistory", default=None)
     icon: Optional[str] = None
     id: Optional[str] = None
+    inherit_issue_estimation: Optional[bool] = Field(
+        alias="inheritIssueEstimation", default=None
+    )
+    inherit_product_intelligence_scope: Optional[bool] = Field(
+        alias="inheritProductIntelligenceScope", default=None
+    )
+    inherit_workflow_statuses: Optional[bool] = Field(
+        alias="inheritWorkflowStatuses", default=None
+    )
     issue_estimation_allow_zero: Optional[bool] = Field(
         alias="issueEstimationAllowZero", default=None
     )
@@ -2659,16 +3359,16 @@ class TeamCreateInput(BaseModel):
     issue_estimation_type: Optional[str] = Field(
         alias="issueEstimationType", default=None
     )
-    issue_ordering_no_priority_first: Optional[bool] = Field(
-        alias="issueOrderingNoPriorityFirst", default=None
-    )
     key: Optional[str] = None
     marked_as_duplicate_workflow_state_id: Optional[str] = Field(
         alias="markedAsDuplicateWorkflowStateId", default=None
     )
     name: str
-    organization_id: Optional[str] = Field(alias="organizationId", default=None)
+    parent_id: Optional[str] = Field(alias="parentId", default=None)
     private: Optional[bool] = None
+    product_intelligence_scope: Optional[ProductIntelligenceScope] = Field(
+        alias="productIntelligenceScope", default=None
+    )
     require_priority_to_leave_triage: Optional[bool] = Field(
         alias="requirePriorityToLeaveTriage", default=None
     )
@@ -2691,6 +3391,7 @@ class TeamFilter(BaseModel):
     key: Optional["StringComparator"] = None
     name: Optional["StringComparator"] = None
     or_: Optional[List["TeamFilter"]] = Field(alias="or", default=None)
+    parent: Optional["NullableTeamFilter"] = None
     updated_at: Optional["DateComparator"] = Field(alias="updatedAt", default=None)
 
 
@@ -2713,8 +3414,17 @@ class TeamSort(BaseModel):
 
 
 class TeamUpdateInput(BaseModel):
+    ai_thread_summaries_enabled: Optional[bool] = Field(
+        alias="aiThreadSummariesEnabled", default=None
+    )
     auto_archive_period: Optional[float] = Field(
         alias="autoArchivePeriod", default=None
+    )
+    auto_close_child_issues: Optional[bool] = Field(
+        alias="autoCloseChildIssues", default=None
+    )
+    auto_close_parent_issues: Optional[bool] = Field(
+        alias="autoCloseParentIssues", default=None
     )
     auto_close_period: Optional[float] = Field(alias="autoClosePeriod", default=None)
     auto_close_state_id: Optional[str] = Field(alias="autoCloseStateId", default=None)
@@ -2723,9 +3433,6 @@ class TeamUpdateInput(BaseModel):
     cycle_duration: Optional[int] = Field(alias="cycleDuration", default=None)
     cycle_enabled_start_date: Optional[Any] = Field(
         alias="cycleEnabledStartDate", default=None
-    )
-    cycle_enabled_start_week: Optional[str] = Field(
-        alias="cycleEnabledStartWeek", default=None
     )
     cycle_issue_auto_assign_completed: Optional[bool] = Field(
         alias="cycleIssueAutoAssignCompleted", default=None
@@ -2754,11 +3461,17 @@ class TeamUpdateInput(BaseModel):
         alias="defaultTemplateForNonMembersId", default=None
     )
     description: Optional[str] = None
-    draft_workflow_state_id: Optional[str] = Field(
-        alias="draftWorkflowStateId", default=None
-    )
     group_issue_history: Optional[bool] = Field(alias="groupIssueHistory", default=None)
     icon: Optional[str] = None
+    inherit_issue_estimation: Optional[bool] = Field(
+        alias="inheritIssueEstimation", default=None
+    )
+    inherit_product_intelligence_scope: Optional[bool] = Field(
+        alias="inheritProductIntelligenceScope", default=None
+    )
+    inherit_workflow_statuses: Optional[bool] = Field(
+        alias="inheritWorkflowStatuses", default=None
+    )
     issue_estimation_allow_zero: Optional[bool] = Field(
         alias="issueEstimationAllowZero", default=None
     )
@@ -2768,27 +3481,19 @@ class TeamUpdateInput(BaseModel):
     issue_estimation_type: Optional[str] = Field(
         alias="issueEstimationType", default=None
     )
-    issue_ordering_no_priority_first: Optional[bool] = Field(
-        alias="issueOrderingNoPriorityFirst", default=None
-    )
     join_by_default: Optional[bool] = Field(alias="joinByDefault", default=None)
     key: Optional[str] = None
     marked_as_duplicate_workflow_state_id: Optional[str] = Field(
         alias="markedAsDuplicateWorkflowStateId", default=None
     )
-    merge_workflow_state_id: Optional[str] = Field(
-        alias="mergeWorkflowStateId", default=None
-    )
-    mergeable_workflow_state_id: Optional[str] = Field(
-        alias="mergeableWorkflowStateId", default=None
-    )
     name: Optional[str] = None
+    parent_id: Optional[str] = Field(alias="parentId", default=None)
     private: Optional[bool] = None
+    product_intelligence_scope: Optional[ProductIntelligenceScope] = Field(
+        alias="productIntelligenceScope", default=None
+    )
     require_priority_to_leave_triage: Optional[bool] = Field(
         alias="requirePriorityToLeaveTriage", default=None
-    )
-    review_workflow_state_id: Optional[str] = Field(
-        alias="reviewWorkflowStateId", default=None
     )
     scim_managed: Optional[bool] = Field(alias="scimManaged", default=None)
     set_issue_sort_order_on_state_change: Optional[str] = Field(
@@ -2801,9 +3506,6 @@ class TeamUpdateInput(BaseModel):
         alias="slackIssueStatuses", default=None
     )
     slack_new_issue: Optional[bool] = Field(alias="slackNewIssue", default=None)
-    start_workflow_state_id: Optional[str] = Field(
-        alias="startWorkflowStateId", default=None
-    )
     timezone: Optional[str] = None
     triage_enabled: Optional[bool] = Field(alias="triageEnabled", default=None)
     upcoming_cycle_count: Optional[float] = Field(
@@ -2829,6 +3531,11 @@ class TemplateUpdateInput(BaseModel):
     template_data: Optional[Any] = Field(alias="templateData", default=None)
 
 
+class TierSort(BaseModel):
+    nulls: Optional[PaginationNulls] = PaginationNulls.last
+    order: Optional[PaginationSortOrder] = None
+
+
 class TimeScheduleCreateInput(BaseModel):
     entries: List["TimeScheduleEntryInput"]
     external_id: Optional[str] = Field(alias="externalId", default=None)
@@ -2851,17 +3558,6 @@ class TimeScheduleUpdateInput(BaseModel):
     name: Optional[str] = None
 
 
-class TimelessDateComparator(BaseModel):
-    eq: Optional[Any] = None
-    gt: Optional[Any] = None
-    gte: Optional[Any] = None
-    in_: Optional[List[Any]] = Field(alias="in", default=None)
-    lt: Optional[Any] = None
-    lte: Optional[Any] = None
-    neq: Optional[Any] = None
-    nin: Optional[List[Any]] = None
-
-
 class TitleSort(BaseModel):
     nulls: Optional[PaginationNulls] = PaginationNulls.last
     order: Optional[PaginationSortOrder] = None
@@ -2870,7 +3566,6 @@ class TitleSort(BaseModel):
 class TokenUserAccountAuthInput(BaseModel):
     email: str
     invite_link: Optional[str] = Field(alias="inviteLink", default=None)
-    team_ids_to_join: Optional[List[str]] = Field(alias="teamIdsToJoin", default=None)
     timezone: str
     token: str
 
@@ -2907,6 +3602,7 @@ class UserCollectionFilter(BaseModel):
     active: Optional["BooleanComparator"] = None
     admin: Optional["BooleanComparator"] = None
     and_: Optional[List["UserCollectionFilter"]] = Field(alias="and", default=None)
+    app: Optional["BooleanComparator"] = None
     assigned_issues: Optional["IssueCollectionFilter"] = Field(
         alias="assignedIssues", default=None
     )
@@ -2917,6 +3613,7 @@ class UserCollectionFilter(BaseModel):
     email: Optional["StringComparator"] = None
     every: Optional["UserFilter"] = None
     id: Optional["IDComparator"] = None
+    invited: Optional["BooleanComparator"] = None
     is_me: Optional["BooleanComparator"] = Field(alias="isMe", default=None)
     length: Optional["NumberComparator"] = None
     name: Optional["StringComparator"] = None
@@ -2929,6 +3626,7 @@ class UserFilter(BaseModel):
     active: Optional["BooleanComparator"] = None
     admin: Optional["BooleanComparator"] = None
     and_: Optional[List["UserFilter"]] = Field(alias="and", default=None)
+    app: Optional["BooleanComparator"] = None
     assigned_issues: Optional["IssueCollectionFilter"] = Field(
         alias="assignedIssues", default=None
     )
@@ -2938,6 +3636,7 @@ class UserFilter(BaseModel):
     )
     email: Optional["StringComparator"] = None
     id: Optional["IDComparator"] = None
+    invited: Optional["BooleanComparator"] = None
     is_me: Optional["BooleanComparator"] = Field(alias="isMe", default=None)
     name: Optional["StringComparator"] = None
     or_: Optional[List["UserFilter"]] = Field(alias="or", default=None)
@@ -2945,12 +3644,18 @@ class UserFilter(BaseModel):
 
 
 class UserSettingsUpdateInput(BaseModel):
+    feed_summary_schedule: Optional[FeedSummarySchedule] = Field(
+        alias="feedSummarySchedule", default=None
+    )
+    notification_category_preferences: Optional[
+        "NotificationCategoryPreferencesInput"
+    ] = Field(alias="notificationCategoryPreferences", default=None)
+    notification_channel_preferences: Optional[
+        "PartialNotificationChannelPreferencesInput"
+    ] = Field(alias="notificationChannelPreferences", default=None)
     notification_delivery_preferences: Optional[
         "NotificationDeliveryPreferencesInput"
     ] = Field(alias="notificationDeliveryPreferences", default=None)
-    notification_preferences: Optional[Any] = Field(
-        alias="notificationPreferences", default=None
-    )
     settings: Optional[Any] = None
     subscribed_to_changelog: Optional[bool] = Field(
         alias="subscribedToChangelog", default=None
@@ -2962,23 +3667,14 @@ class UserSettingsUpdateInput(BaseModel):
     subscribed_to_privacy_legal_updates: Optional[bool] = Field(
         alias="subscribedToPrivacyLegalUpdates", default=None
     )
-    subscribed_to_unread_notifications_reminder: Optional[bool] = Field(
-        alias="subscribedToUnreadNotificationsReminder", default=None
-    )
-    unsubscribed_from: Optional[List[str]] = Field(
-        alias="unsubscribedFrom", default=None
-    )
     usage_warning_history: Optional[Any] = Field(
         alias="usageWarningHistory", default=None
     )
 
 
 class UserUpdateInput(BaseModel):
-    active: Optional[bool] = None
-    admin: Optional[bool] = None
     avatar_url: Optional[str] = Field(alias="avatarUrl", default=None)
     description: Optional[str] = None
-    disable_reason: Optional[str] = Field(alias="disableReason", default=None)
     display_name: Optional[str] = Field(alias="displayName", default=None)
     name: Optional[str] = None
     status_emoji: Optional[str] = Field(alias="statusEmoji", default=None)
@@ -2989,13 +3685,13 @@ class UserUpdateInput(BaseModel):
 
 class ViewPreferencesCreateInput(BaseModel):
     custom_view_id: Optional[str] = Field(alias="customViewId", default=None)
-    cycle_id: Optional[str] = Field(alias="cycleId", default=None)
     id: Optional[str] = None
     initiative_id: Optional[str] = Field(alias="initiativeId", default=None)
     insights: Optional[Any] = None
     label_id: Optional[str] = Field(alias="labelId", default=None)
     preferences: Any
     project_id: Optional[str] = Field(alias="projectId", default=None)
+    project_label_id: Optional[str] = Field(alias="projectLabelId", default=None)
     roadmap_id: Optional[str] = Field(alias="roadmapId", default=None)
     team_id: Optional[str] = Field(alias="teamId", default=None)
     type: ViewPreferencesType
@@ -3027,13 +3723,6 @@ class WebhookUpdateInput(BaseModel):
     url: Optional[str] = None
 
 
-class WorkflowCondition(BaseModel):
-    issue_filter: Optional["IssueFilter"] = Field(alias="issueFilter", default=None)
-    project_filter: Optional["ProjectFilter"] = Field(
-        alias="projectFilter", default=None
-    )
-
-
 class WorkflowStateCreateInput(BaseModel):
     color: str
     description: Optional[str] = None
@@ -3059,6 +3748,9 @@ class WorkflowStateFilter(BaseModel):
 
 
 class WorkflowStateSort(BaseModel):
+    closed_issues_ordered_by_recency: Optional[bool] = Field(
+        alias="closedIssuesOrderedByRecency", default=False
+    )
     nulls: Optional[PaginationNulls] = PaginationNulls.last
     order: Optional[PaginationSortOrder] = None
 
@@ -3081,6 +3773,7 @@ class ZendeskSettingsInput(BaseModel):
         alias="automateTicketReopeningOnCompletion", default=None
     )
     bot_user_id: Optional[str] = Field(alias="botUserId", default=None)
+    can_read_customers: Optional[bool] = Field(alias="canReadCustomers", default=None)
     send_note_on_comment: Optional[bool] = Field(
         alias="sendNoteOnComment", default=None
     )

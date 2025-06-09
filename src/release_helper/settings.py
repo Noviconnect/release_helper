@@ -14,11 +14,23 @@ class LinearSettings(BaseSettings):
     token: str
 
 
+class NotionSettings(BaseSettings):
+    token: str
+    parent_page_id: str
+
+
+class OpenAISettings(BaseSettings):
+    api_key: str
+    model: str = "gpt-4o"
+
+
 class HelperSettings(BaseSettings):
     deploy: bool = False
     github_token: str
     linear: LinearSettings
     slack: SlackSettings
+    notion: NotionSettings = None
+    openai: OpenAISettings = None
 
 
 class Settings(BaseSettings):

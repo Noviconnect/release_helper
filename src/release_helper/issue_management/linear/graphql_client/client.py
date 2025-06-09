@@ -23,6 +23,11 @@ class Client(BaseClient):
               issue(id: $issueId) {
                 id
                 title
+                description
+                priority
+                priorityLabel
+                createdAt
+                completedAt
                 state {
                   name
                   type
@@ -41,6 +46,20 @@ class Client(BaseClient):
                 identifier
                 team {
                   key
+                  name
+                }
+                labels {
+                  nodes {
+                    id
+                    name
+                    color
+                  }
+                }
+                project {
+                  id
+                  name
+                  description
+                  url
                 }
               }
             }

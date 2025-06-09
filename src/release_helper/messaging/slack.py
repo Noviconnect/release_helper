@@ -101,13 +101,18 @@ class MessagingSlack:
             text=f"Release {release_title} for {repository_short}",
         )
 
-    def send_deploy_message(self, *, channel: str, release_title: str) -> None:
+    def send_deploy_message(
+        self, *, channel: str, release_title: str, notion_url: str
+    ) -> None:
+        text = f"All issues are in completed state - ** Deploying {release_title}**"
+        text += f"\n\n:notebook: <{notion_url}|View detailed release notes in Notion>"
+
         blocks = [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"All issues are in completed state - ** Deploying {release_title}**",
+                    "text": text,
                 },
             }
         ]

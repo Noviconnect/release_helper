@@ -2,6 +2,11 @@ query Issue($issueId: String!) {
     issue(id: $issueId) {
         id
         title
+        description
+        priority
+        priorityLabel
+        createdAt
+        completedAt
         state {
             name
             type
@@ -20,6 +25,27 @@ query Issue($issueId: String!) {
         identifier
         team {
             key
+            name
+        }
+        labels {
+            nodes {
+                id
+                name
+                color
+            }
+        }
+        project {
+            id
+            name
+            description
+            url
+            initiatives {
+                nodes {
+                    id
+                    name
+                    description
+                }
+            }
         }
     }
 }

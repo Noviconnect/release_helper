@@ -24,6 +24,12 @@ class CustomerStatusType(str, Enum):
     inactive = "inactive"
 
 
+class CyclePeriod(str, Enum):
+    after = "after"
+    before = "before"
+    during = "during"
+
+
 class DateResolutionType(str, Enum):
     halfYear = "halfYear"
     month = "month"
@@ -41,15 +47,27 @@ class Day(str, Enum):
     Wednesday = "Wednesday"
 
 
+class ExternalSyncService(str, Enum):
+    github = "github"
+    jira = "jira"
+    slack = "slack"
+
+
 class FacetPageSource(str, Enum):
+    feed = "feed"
     projects = "projects"
+    teamIssues = "teamIssues"
 
 
-class FeatureFlagRolloutStageType(str, Enum):
-    dev = "dev"
-    full = "full"
-    internal = "internal"
-    partial = "partial"
+class FeedSummarySchedule(str, Enum):
+    daily = "daily"
+    never = "never"
+    weekly = "weekly"
+
+
+class FrequencyResolutionType(str, Enum):
+    daily = "daily"
+    weekly = "weekly"
 
 
 class GitAutomationStates(str, Enum):
@@ -58,6 +76,12 @@ class GitAutomationStates(str, Enum):
     mergeable = "mergeable"
     review = "review"
     start = "start"
+
+
+class GitLinkKind(str, Enum):
+    closes = "closes"
+    contributes = "contributes"
+    links = "links"
 
 
 class GithubOrgType(str, Enum):
@@ -74,6 +98,12 @@ class InitiativeStatus(str, Enum):
 class InitiativeTab(str, Enum):
     overview = "overview"
     projects = "projects"
+
+
+class InitiativeUpdateHealthType(str, Enum):
+    atRisk = "atRisk"
+    offTrack = "offTrack"
+    onTrack = "onTrack"
 
 
 class IntegrationService(str, Enum):
@@ -95,14 +125,18 @@ class IntegrationService(str, Enum):
     jira = "jira"
     jiraPersonal = "jiraPersonal"
     launchDarkly = "launchDarkly"
+    launchDarklyPersonal = "launchDarklyPersonal"
     loom = "loom"
     notion = "notion"
     opsgenie = "opsgenie"
     pagerDuty = "pagerDuty"
+    salesforce = "salesforce"
     sentry = "sentry"
     slack = "slack"
     slackAsks = "slackAsks"
     slackCustomViewNotifications = "slackCustomViewNotifications"
+    slackInitiativePost = "slackInitiativePost"
+    slackOrgInitiativeUpdatesPost = "slackOrgInitiativeUpdatesPost"
     slackOrgProjectUpdatesPost = "slackOrgProjectUpdatesPost"
     slackPersonal = "slackPersonal"
     slackPost = "slackPost"
@@ -115,6 +149,47 @@ class IssueRelationType(str, Enum):
     blocks = "blocks"
     duplicate = "duplicate"
     related = "related"
+    similar = "similar"
+
+
+class IssueSuggestionState(str, Enum):
+    accepted = "accepted"
+    active = "active"
+    dismissed = "dismissed"
+    stale = "stale"
+
+
+class IssueSuggestionType(str, Enum):
+    assignee = "assignee"
+    label = "label"
+    project = "project"
+    relatedIssue = "relatedIssue"
+    similarIssue = "similarIssue"
+    team = "team"
+
+
+class NotificationCategory(str, Enum):
+    appsAndIntegrations = "appsAndIntegrations"
+    assignments = "assignments"
+    commentsAndReplies = "commentsAndReplies"
+    customers = "customers"
+    documentChanges = "documentChanges"
+    mentions = "mentions"
+    postsAndUpdates = "postsAndUpdates"
+    reactions = "reactions"
+    reminders = "reminders"
+    reviews = "reviews"
+    statusChanges = "statusChanges"
+    subscriptions = "subscriptions"
+    system = "system"
+    triage = "triage"
+
+
+class NotificationChannel(str, Enum):
+    desktop = "desktop"
+    email = "email"
+    mobile = "mobile"
+    slack = "slack"
 
 
 class OAuthClientApprovalStatus(str, Enum):
@@ -134,6 +209,98 @@ class OrganizationInviteStatus(str, Enum):
     pending = "pending"
 
 
+class OtherNotificationType(str, Enum):
+    customerAddedAsOwner = "customerAddedAsOwner"
+    customerNeedCreated = "customerNeedCreated"
+    customerNeedMarkedAsImportant = "customerNeedMarkedAsImportant"
+    customerNeedResolved = "customerNeedResolved"
+    documentCommentMention = "documentCommentMention"
+    documentCommentReaction = "documentCommentReaction"
+    documentContentChange = "documentContentChange"
+    documentDeleted = "documentDeleted"
+    documentMention = "documentMention"
+    documentMoved = "documentMoved"
+    documentNewComment = "documentNewComment"
+    documentReminder = "documentReminder"
+    documentRestored = "documentRestored"
+    documentSubscribed = "documentSubscribed"
+    documentThreadResolved = "documentThreadResolved"
+    documentUnsubscribed = "documentUnsubscribed"
+    feedSummaryGenerated = "feedSummaryGenerated"
+    initiativeAddedAsOwner = "initiativeAddedAsOwner"
+    initiativeCommentMention = "initiativeCommentMention"
+    initiativeCommentReaction = "initiativeCommentReaction"
+    initiativeDescriptionContentChange = "initiativeDescriptionContentChange"
+    initiativeMention = "initiativeMention"
+    initiativeNewComment = "initiativeNewComment"
+    initiativeReminder = "initiativeReminder"
+    initiativeThreadResolved = "initiativeThreadResolved"
+    initiativeUpdateCommentMention = "initiativeUpdateCommentMention"
+    initiativeUpdateCommentReaction = "initiativeUpdateCommentReaction"
+    initiativeUpdateCreated = "initiativeUpdateCreated"
+    initiativeUpdateMention = "initiativeUpdateMention"
+    initiativeUpdateNewComment = "initiativeUpdateNewComment"
+    initiativeUpdatePrompt = "initiativeUpdatePrompt"
+    initiativeUpdateReaction = "initiativeUpdateReaction"
+    issueAddedToTriage = "issueAddedToTriage"
+    issueAddedToView = "issueAddedToView"
+    issueBlocking = "issueBlocking"
+    issueCreated = "issueCreated"
+    issueDue = "issueDue"
+    issuePriorityUrgent = "issuePriorityUrgent"
+    issueReminder = "issueReminder"
+    issueReopened = "issueReopened"
+    issueSlaBreached = "issueSlaBreached"
+    issueSlaHighRisk = "issueSlaHighRisk"
+    issueStatusChangedAll = "issueStatusChangedAll"
+    issueSubscribed = "issueSubscribed"
+    issueThreadResolved = "issueThreadResolved"
+    issueUnblocked = "issueUnblocked"
+    issueUnsubscribed = "issueUnsubscribed"
+    oauthClientApprovalCreated = "oauthClientApprovalCreated"
+    projectAddedAsLead = "projectAddedAsLead"
+    projectAddedAsMember = "projectAddedAsMember"
+    projectCommentMention = "projectCommentMention"
+    projectCommentReaction = "projectCommentReaction"
+    projectDescriptionContentChange = "projectDescriptionContentChange"
+    projectMention = "projectMention"
+    projectMilestoneCommentMention = "projectMilestoneCommentMention"
+    projectMilestoneCommentReaction = "projectMilestoneCommentReaction"
+    projectMilestoneDescriptionContentChange = (
+        "projectMilestoneDescriptionContentChange"
+    )
+    projectMilestoneMention = "projectMilestoneMention"
+    projectMilestoneNewComment = "projectMilestoneNewComment"
+    projectMilestoneThreadResolved = "projectMilestoneThreadResolved"
+    projectNewComment = "projectNewComment"
+    projectReminder = "projectReminder"
+    projectThreadResolved = "projectThreadResolved"
+    projectUpdateCommentMention = "projectUpdateCommentMention"
+    projectUpdateCommentReaction = "projectUpdateCommentReaction"
+    projectUpdateCreated = "projectUpdateCreated"
+    projectUpdateMention = "projectUpdateMention"
+    projectUpdateNewComment = "projectUpdateNewComment"
+    projectUpdatePrompt = "projectUpdatePrompt"
+    projectUpdateReaction = "projectUpdateReaction"
+    pullRequestApproved = "pullRequestApproved"
+    pullRequestChangesRequested = "pullRequestChangesRequested"
+    pullRequestChecksFailed = "pullRequestChecksFailed"
+    pullRequestCommentMention = "pullRequestCommentMention"
+    pullRequestCommented = "pullRequestCommented"
+    pullRequestMention = "pullRequestMention"
+    pullRequestRemovedFromMergeQueue = "pullRequestRemovedFromMergeQueue"
+    pullRequestReviewRequested = "pullRequestReviewRequested"
+    pullRequestReviewRerequested = "pullRequestReviewRerequested"
+    system = "system"
+    teamUpdateCommentMention = "teamUpdateCommentMention"
+    teamUpdateCommentReaction = "teamUpdateCommentReaction"
+    teamUpdateCreated = "teamUpdateCreated"
+    teamUpdateMention = "teamUpdateMention"
+    teamUpdateNewComment = "teamUpdateNewComment"
+    teamUpdateReaction = "teamUpdateReaction"
+    triageResponsibilityIssueAddedToTriage = "triageResponsibilityIssueAddedToTriage"
+
+
 class PaginationNulls(str, Enum):
     first = "first"
     last = "last"
@@ -149,6 +316,25 @@ class PaginationSortOrder(str, Enum):
     Descending = "Descending"
 
 
+class PostType(str, Enum):
+    summary = "summary"
+    update = "update"
+
+
+class ProductIntelligenceScope(str, Enum):
+    none = "none"
+    team = "team"
+    teamHierarchy = "teamHierarchy"
+    workspace = "workspace"
+
+
+class ProjectMilestoneStatus(str, Enum):
+    done = "done"
+    next = "next"
+    overdue = "overdue"
+    unstarted = "unstarted"
+
+
 class ProjectStatusType(str, Enum):
     backlog = "backlog"
     canceled = "canceled"
@@ -159,6 +345,7 @@ class ProjectStatusType(str, Enum):
 
 
 class ProjectTab(str, Enum):
+    customers = "customers"
     documents = "documents"
     issues = "issues"
 
@@ -176,6 +363,20 @@ class ProjectUpdateReminderFrequency(str, Enum):
     week = "week"
 
 
+class PullRequestReviewTool(str, Enum):
+    graphite = "graphite"
+    source = "source"
+
+
+class PullRequestStatus(str, Enum):
+    approved = "approved"
+    closed = "closed"
+    draft = "draft"
+    inReview = "inReview"
+    merged = "merged"
+    open = "open"
+
+
 class PushSubscriptionType(str, Enum):
     apple = "apple"
     appleDevelopment = "appleDevelopment"
@@ -185,6 +386,7 @@ class PushSubscriptionType(str, Enum):
 
 class ReleaseChannel(str, Enum):
     beta = "beta"
+    development = "development"
     internal = "internal"
     preRelease = "preRelease"
     public = "public"
@@ -195,11 +397,11 @@ class SLADayCountType(str, Enum):
     onlyBusinessDays = "onlyBusinessDays"
 
 
-class SchemaFieldType(str, Enum):
-    booleanType = "booleanType"
-    dateType = "dateType"
-    numberType = "numberType"
-    stringType = "stringType"
+class SemanticSearchResultType(str, Enum):
+    document = "document"
+    initiative = "initiative"
+    issue = "issue"
+    project = "project"
 
 
 class SendStrategy(str, Enum):
@@ -239,6 +441,7 @@ class UserFlagType(str, Enum):
     analyticsWelcomeDismissed = "analyticsWelcomeDismissed"
     canPlaySnake = "canPlaySnake"
     canPlayTetris = "canPlayTetris"
+    commandMenuClearShortcutTip = "commandMenuClearShortcutTip"
     completedOnboarding = "completedOnboarding"
     cycleWelcomeDismissed = "cycleWelcomeDismissed"
     desktopDownloadToastDismissed = "desktopDownloadToastDismissed"
@@ -270,6 +473,7 @@ class UserFlagType(str, Enum):
     )
     projectUpdatesWelcomeDismissed = "projectUpdatesWelcomeDismissed"
     projectWelcomeDismissed = "projectWelcomeDismissed"
+    pulseWelcomeDismissed = "pulseWelcomeDismissed"
     rewindBannerDismissed = "rewindBannerDismissed"
     slackCommentReactionTipShown = "slackCommentReactionTipShown"
     teamsPageIntroductionDismissed = "teamsPageIntroductionDismissed"
@@ -292,6 +496,7 @@ class UserFlagUpdateOperation(str, Enum):
 
 class UserRoleType(str, Enum):
     admin = "admin"
+    app = "app"
     guest = "guest"
     user = "user"
 
@@ -311,11 +516,19 @@ class ViewType(str, Enum):
     customRoadmap = "customRoadmap"
     customView = "customView"
     customViews = "customViews"
+    customer = "customer"
     customers = "customers"
     cycle = "cycle"
+    dashboards = "dashboards"
+    embeddedCustomerNeeds = "embeddedCustomerNeeds"
+    feedAll = "feedAll"
+    feedCreated = "feedCreated"
+    feedFollowing = "feedFollowing"
+    feedPopular = "feedPopular"
     inbox = "inbox"
     initiative = "initiative"
     initiativeOverview = "initiativeOverview"
+    initiativeOverviewSubInitiatives = "initiativeOverviewSubInitiatives"
     initiatives = "initiatives"
     initiativesCompleted = "initiativesCompleted"
     initiativesPlanned = "initiativesPlanned"
@@ -325,13 +538,17 @@ class ViewType(str, Enum):
     myIssuesActivity = "myIssuesActivity"
     myIssuesCreatedByMe = "myIssuesCreatedByMe"
     myIssuesSubscribedTo = "myIssuesSubscribedTo"
+    myReviews = "myReviews"
     project = "project"
+    projectCustomerNeeds = "projectCustomerNeeds"
     projectDocuments = "projectDocuments"
+    projectLabel = "projectLabel"
     projects = "projects"
     projectsAll = "projectsAll"
     projectsBacklog = "projectsBacklog"
     projectsClosed = "projectsClosed"
     quickView = "quickView"
+    reviews = "reviews"
     roadmap = "roadmap"
     roadmapAll = "roadmapAll"
     roadmapBacklog = "roadmapBacklog"
@@ -339,26 +556,9 @@ class ViewType(str, Enum):
     roadmaps = "roadmaps"
     search = "search"
     splitSearch = "splitSearch"
+    subIssues = "subIssues"
     teams = "teams"
     triage = "triage"
     userProfile = "userProfile"
     userProfileCreatedByUser = "userProfileCreatedByUser"
-
-
-class WorkflowTrigger(str, Enum):
-    entityCreated = "entityCreated"
-    entityCreatedOrUpdated = "entityCreatedOrUpdated"
-    entityRemoved = "entityRemoved"
-    entityUnarchived = "entityUnarchived"
-    entityUpdated = "entityUpdated"
-
-
-class WorkflowTriggerType(str, Enum):
-    issue = "issue"
-    project = "project"
-
-
-class WorkflowType(str, Enum):
-    custom = "custom"
-    sla = "sla"
-    viewSubscription = "viewSubscription"
+    workspaceMembers = "workspaceMembers"
