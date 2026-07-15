@@ -13,7 +13,7 @@ jobs:
   run-release-helper:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
       - name: Run Release Helper
         uses: noviconnect/release-helper-action@v1
         with:
